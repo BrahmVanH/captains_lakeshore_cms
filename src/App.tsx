@@ -1,43 +1,41 @@
-import { useState } from 'react'
-import { ApolloClient, HttpLink, InMemoryCache } from '@apollo/client'
+import { useState } from 'react';
+import { ApolloClient, HttpLink, InMemoryCache, ApolloProvider } from '@apollo/client';
+import { HashRouter as Router, Routes, Route } from 'react-router-dom';
 
-const client = new ApolloClient({
-  cache: new InMemoryCache(),
-  link: new HttpLink({
-    uri: 'http://localhost:4000/graphql',
-  }),
-})
+import styled from 'styled-components';
+
+import { ThemeProvider } from 'styled-components';
+import Navbar from './components/Navbar';
+import Dashboard from './pages/Dashboard';
 
 const link = new HttpLink({
-	uri: process.env.NODE_ENV === 'production' ? '/graphql' : 'http://localhost:3001/graphql',
+	uri: process.env.NODE_ENV === 'production' ? import.meta.env.LAMBDA_FUNCTION_URI : import.meta.env.LOCALHOST,
 });
-function App() {
-  const [count, setCount] = useState(0)
 
-  return (
-    <>
-      <div>
-        <a href="https://vitejs.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
-      </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.tsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
-    </>
-  )
+const client = new ApolloClient({
+	cache: new InMemoryCache(),
+	link,
+});
+
+function App() {
+	const theme = {
+		primary: '#5f8fa5',
+		primaryStroke: ['#ffffff', '#abccd8', '#5f8fa5', '#abccd8', '#ffffff'],
+		secondary: 'rgb(200, 188, 167, 0.6)',
+	};
+
+	return (
+		<Router>
+			<ApolloProvider client={client}>
+				<ThemeProvider theme={theme}>
+					<Navbar />
+					<Routes>
+						<Route path='/' element={<Dashboard />} />
+					</Routes>
+				</ThemeProvider>
+			</ApolloProvider>
+		</Router>
+	);
 }
 
-export default App
+export default App;

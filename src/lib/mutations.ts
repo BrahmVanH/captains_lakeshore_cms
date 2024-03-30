@@ -1,12 +1,15 @@
-import { gql } from '../__generated__/gql';
+import { gql } from '@apollo/client';
 
 export const CREATE_USER = gql(/* GraphQL */ `
 	mutation CreateUser($input: CreateUserInput!) {
 		createUser(input: $input) {
-			_id
-			firstName
-			lastName
-			username
+			token
+			user {
+				_id
+				firstName
+				lastName
+				username
+			}
 		}
 	}
 `);
@@ -14,10 +17,27 @@ export const CREATE_USER = gql(/* GraphQL */ `
 export const LOGIN_USER = gql(/* GraphQL */ `
 	mutation LoginUser($input: LoginUserInput!) {
 		loginUser(input: $input) {
-			_id
-			firstName
-			lastName
-			username
+			token
+			user {
+				_id
+				firstName
+				lastName
+				username
+			}
+		}
+	}
+`);
+
+export const DELETE_USER = gql(/* GraphQL */ `
+	mutation removeUser($input: RemoveUserInput!) {
+		removeUser(input: $input) {
+			token
+			user {
+				_id
+				firstName
+				lastName
+				username
+			}
 		}
 	}
 `);
@@ -32,7 +52,7 @@ export const CREATE_BOOKING = gql(/* GraphQL */ `
 `);
 
 export const DELETE_BOOKING = gql(/* GraphQL */ `
-	mutation removeBooking($input: DeleteBookingInput!) {
+	mutation removeBooking($input: RemoveBookingInput!) {
 		removeBooking(input: $input) {
 			dateValue
 			propertyName
