@@ -5,6 +5,8 @@ import { ThemeProvider } from 'styled-components';
 import Navbar from './components/Navbar';
 import Dashboard from './pages/Dashboard';
 
+
+
 const client = new ApolloClient({
 	cache: new InMemoryCache(),
 	link: new HttpLink({

@@ -1,6 +1,6 @@
 export const uploadImgToS3 = async (file: File, presignedUploadUrl: string) => {
 	try {
-		const headers = new Headers({ 'Content-Type': 'image/*' });
+		const headers = new Headers({ 'Content-Type': 'image/jpg' });
 		const response = await fetch(presignedUploadUrl, {
       method: 'PUT',
       headers,
