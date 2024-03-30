@@ -1,11 +1,9 @@
-import React, { useEffect, useState, useRef } from 'react';
+import { useEffect, useState } from 'react';
 import * as Auth from '../lib/auth';
 import { RxHamburgerMenu } from 'react-icons/rx';
 
 import mobileLogoSvg from '../assets/logo.svg';
 import logoSvg from '../assets/log_no_trees.svg';
-import Image from 'next/image';
-import Link from 'next/link';
 
 function Navbar() {
 	const [mobileViewport, setMobileViewport] = useState(false);
@@ -36,28 +34,28 @@ function Navbar() {
 		<>
 			<nav className=''>
 				<div className='.flex .justify-between .p-2'>
-					<Link className='' href={'/'}>
-						<Image alt='Captains Lake Superior branding' src={brandLogo.image} width={brandLogo.width} />
-					</Link>
+					<a className='' href={'/'}>
+						<img alt='Captains Lake Superior branding' src={brandLogo.image} width={brandLogo.width} />
+					</a>
 					{mobileViewport ? (
 						<button data-collapse-toggle='navbar-dropdown' type='button' className='.bg-transparent .border-none .shadow-none' aria-controls='navbar-dropdown' aria-expanded='false'>
 							<RxHamburgerMenu size={'20px'} />
 						</button>
 					) : (
 						<div className='link-container'>
-							<Link href={'/'} className='navbar-link'>
+							<a href={'/'} className='navbar-link'>
 								Home
-							</Link>
-							<Link href={'/about'} className='navbar-link'>
+							</a>
+							<a href={'/about'} className='navbar-link'>
 								About Us
-							</Link>
-							<Link href={'/contact'} className='navbar-link'>
+							</a>
+							<a href={'/contact'} className='navbar-link'>
 								Contact
-							</Link>
+							</a>
 							{Auth.loggedIn() ? (
-								<Link href='/' onClick={() => Auth.logout()} className='navbar-link'>
+								<a href='/' onClick={() => Auth.logout()} className='navbar-link'>
 									Log Out
-								</Link>
+								</a>
 							) : (
 								<></>
 							)}
@@ -66,19 +64,19 @@ function Navbar() {
 				</div>
 			</nav>
 			<div id='navbar-dropdown' className='hidden .flex .items-center .flex-col .m-auto .w-full .border .rounded-bl-lg .rounded-br-lg .bg-blue-500 .text-white .absolute .z-50'>
-				<Link href={'/'} className='navbar-link'>
+				<a href={'/'} className='navbar-link'>
 					Home
-				</Link>
-				<Link href={'/about'} className='navbar-link'>
+				</a>
+				<a href={'/about'} className='navbar-link'>
 					About Us
-				</Link>
-				<Link href={'/contact'} className='navbar-link'>
+				</a>
+				<a href={'/contact'} className='navbar-link'>
 					Contact
-				</Link>
+				</a>
 				{Auth.loggedIn() ? (
-					<Link href='/' onClick={() => Auth.logout()} className='navbar-link'>
+					<a href='/' onClick={() => Auth.logout()} className='navbar-link'>
 						Log Out
-					</Link>
+					</a>
 				) : (
 					<></>
 				)}

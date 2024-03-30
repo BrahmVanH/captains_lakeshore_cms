@@ -1,15 +1,12 @@
-import { useState } from 'react';
 import { ApolloClient, HttpLink, InMemoryCache, ApolloProvider } from '@apollo/client';
 import { HashRouter as Router, Routes, Route } from 'react-router-dom';
-
-import styled from 'styled-components';
 
 import { ThemeProvider } from 'styled-components';
 import Navbar from './components/Navbar';
 import Dashboard from './pages/Dashboard';
 
 const link = new HttpLink({
-	uri: process.env.NODE_ENV === 'production' ? import.meta.env.LAMBDA_FUNCTION_URI : import.meta.env.LOCALHOST,
+	uri: import.meta.env.PROD ? import.meta.env.LAMBDA_FUNCTION_URI : import.meta.env.LOCALHOST,
 });
 
 const client = new ApolloClient({

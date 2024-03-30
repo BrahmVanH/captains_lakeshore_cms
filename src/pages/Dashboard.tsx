@@ -1,14 +1,9 @@
+// import { useEffect, useState } from 'react';
 import * as Auth from '../lib/auth';
 
 import Login from '../components/Login';
+import Property from './Property';
 
 export default function Dashboard() {
-  return (
-    {Auth.loggedIn() ? (
-      <div>
-      <h1>Dashboard</h1>
-      </div>
-    ) : (
-      <Login />)}
-  );
+	return <>{Auth.loggedIn() ? <Property propertyName="hideaway" /> : <Login />}</>;
 }

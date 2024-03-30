@@ -1,5 +1,4 @@
-// import { gql } from './__generated__/gql';
-import { gql } from '@apollo/client';
+import { gql } from './__generated__/gql';
 
 export const GET_ALL_USERS = gql(/* GraphQL */ `
 	query GetAllUsers {
@@ -34,13 +33,13 @@ export const GET_HOME_IMGS = gql(/* GraphQL */ `
 export const GET_HIDEAWAY_IMGS = gql(/* GraphQL */ `
 	query GetHideawayImgs {
 		getHideawayImgs {
-			headerImgUrl
-			galleryArray {
-				original
-				thumbnail
-				originalAlt
-				thumbnailAlt
-			}
+				headerUrl
+				galleryArray {
+					original
+					thumbnail
+					originalAlt
+					thumbnailAlt
+				}
 		}
 	}
 `);
@@ -48,7 +47,7 @@ export const GET_HIDEAWAY_IMGS = gql(/* GraphQL */ `
 export const GET_COTTAGE_IMGS = gql(/* GraphQL */ `
 	query GetCottageImgs {
 		getCottageImgs {
-			headerImgUrl
+			headerUrl
 			galleryArray {
 				original
 				thumbnail
@@ -60,7 +59,21 @@ export const GET_COTTAGE_IMGS = gql(/* GraphQL */ `
 `);
 
 export const GET_ABOUT_IMGS = gql(/* GraphQL */ `
-	query GetAboutImgs {
-		getAboutImg
+	query GetAboutPgImg {
+		getAboutPgImg
+	}
+`);
+
+export const GET_PROPERTY_INFO = gql(/* GraphQL */ `
+	query GetPropertyInfo($propertyName: String!) {
+		getPropertyInfo(propertyName: $propertyName) {
+			propertyName
+			propertyDescription
+			amenities {
+				amenityName
+				amenityIconJSX
+			}
+			headerImgKey
+		}
 	}
 `);
