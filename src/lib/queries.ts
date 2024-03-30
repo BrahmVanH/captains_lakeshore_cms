@@ -35,6 +35,7 @@ export const GET_HIDEAWAY_IMGS = gql(/* GraphQL */ `
 		getHideawayImgs {
 			headerUrl
 			galleryArray {
+				imgKey
 				original
 				thumbnail
 				originalAlt
