@@ -1,7 +1,12 @@
-import { useCallback, useEffect } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { useLazyQuery } from '@apollo/client';
 import { GET_HIDEAWAY_IMGS, GET_COTTAGE_IMGS } from '../lib/queries';
 // import { PropertyInformation } from '../types';
+import ImageGallery from '../components/ImageGallery';
+import UploadImage from '../components/UploadImage';
+import { ImageObject } from '../lib/__generated__/graphql';
+import { Image } from 'react-grid-gallery';
+import { GalImg } from '../types';
 
 export default function Property({ propertyName }: { propertyName: string }) {
 	// const [propertyInformation, setPropertyInformation] = useState<PropertyInformation | null>(null);
@@ -12,6 +17,7 @@ export default function Property({ propertyName }: { propertyName: string }) {
 	// 	},
 	// });
 
+	const [galleryArray, setGalleryArray] = useState<GalImg[] | null>([]);
 	const [getCottageImages, { loading: cotImgLoading, error: cotImgError, data: cotImgData }] = useLazyQuery(GET_COTTAGE_IMGS);
 	const [getHideawayImages, { loading: hideImgLoading, error: hideImgError, data: hideImgData }] = useLazyQuery(GET_HIDEAWAY_IMGS);
 
@@ -51,9 +57,14 @@ export default function Property({ propertyName }: { propertyName: string }) {
 
 	useEffect(() => {
 		if (hideImgData && !hideImgLoading && !hideImgError) {
-			console.log(hideImgData);
+			setGalleryArray(hideImgData.getHideawayImgs.galleryArray as GalImg[]);
 		}
 	}, [hideImgData, hideImgLoading, hideImgError]);
 
-	return <></>;
+	return (
+		<>
+			{galleryArray ? <ImageGallery galleryArray={galleryArray} /> : <>Loading...</>}
+			<UploadImage propertyName={propertyName} />
+		</>
+	);
 }

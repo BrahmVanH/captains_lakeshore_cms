@@ -33,13 +33,13 @@ export const GET_HOME_IMGS = gql(/* GraphQL */ `
 export const GET_HIDEAWAY_IMGS = gql(/* GraphQL */ `
 	query GetHideawayImgs {
 		getHideawayImgs {
-				headerUrl
-				galleryArray {
-					original
-					thumbnail
-					originalAlt
-					thumbnailAlt
-				}
+			headerUrl
+			galleryArray {
+				original
+				thumbnail
+				originalAlt
+				thumbnailAlt
+			}
 		}
 	}
 `);
@@ -75,5 +75,11 @@ export const GET_PROPERTY_INFO = gql(/* GraphQL */ `
 			}
 			headerImgKey
 		}
+	}
+`);
+
+export const GET_PRESEIGNED_URL = gql(/* GraphQL */ `
+	query GetPresignedS3Url($imgKey: String!, $commandType: String!) {
+		getPresignedS3Url(imgKey: $imgKey, commandType: $commandType)
 	}
 `);

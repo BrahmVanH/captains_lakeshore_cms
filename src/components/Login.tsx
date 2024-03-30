@@ -126,6 +126,7 @@ export default function Login() {
 
 	useEffect(() => {
 		if (input) {
+			console.log('input:', input);
 			handleLogin(input);
 		}
 	}, [input, handleLogin]);
@@ -137,7 +138,7 @@ export default function Login() {
 			</HeaderContainer>
 			<Form ref={form} onSubmit={handleSubmit((data) => setInput(data))}>
 				<Input autoComplete='username' type='text' minLength={5} maxLength={25} placeholder='username' {...register('username', { required: true })} />
-				<Input autoComplete='current-password' type='password' minLength={5} maxLength={25} placeholder='password' {...register('password', { required: true })} />
+				<Input autoComplete='current-password' type='password' minLength={5} maxLength={25} placeholder='password' {...register('userPassword', { required: true })} />
 
 				{(errors.username && errors.username.type === 'required') || (errors.password && errors.password.type === 'required') ? (
 					<AlertRect>

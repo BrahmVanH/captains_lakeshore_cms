@@ -5,13 +5,11 @@ import { ThemeProvider } from 'styled-components';
 import Navbar from './components/Navbar';
 import Dashboard from './pages/Dashboard';
 
-const link = new HttpLink({
-	uri: import.meta.env.PROD ? import.meta.env.LAMBDA_FUNCTION_URI : import.meta.env.LOCALHOST,
-});
-
 const client = new ApolloClient({
 	cache: new InMemoryCache(),
-	link,
+	link: new HttpLink({
+		uri: import.meta.env.PROD ? import.meta.env.VITE_LAMBDA_FUNCTION_URI : import.meta.env.VITE_LOCALHOST,
+	}),
 });
 
 function App() {
