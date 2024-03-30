@@ -120,6 +120,7 @@ export type Query = {
 
 
 export type QueryGetPresignedS3UrlArgs = {
+  altTag: Scalars['String']['input'];
   commandType: Scalars['String']['input'];
   imgKey: Scalars['String']['input'];
 };
@@ -185,6 +186,7 @@ export type HomePgImgPack = {
 
 export type ImageObject = {
   __typename?: 'imageObject';
+  imgKey: Scalars['String']['output'];
   original: Scalars['String']['output'];
   originalAlt: Scalars['String']['output'];
   thumbnail: Scalars['String']['output'];
@@ -268,6 +270,7 @@ export type GetPropertyInfoQuery = { __typename?: 'Query', getPropertyInfo: { __
 export type GetPresignedS3UrlQueryVariables = Exact<{
   imgKey: Scalars['String']['input'];
   commandType: Scalars['String']['input'];
+  altTag: Scalars['String']['input'];
 }>;
 
 
@@ -286,7 +289,7 @@ export const GetHideawayImgsDocument = {"kind":"Document","definitions":[{"kind"
 export const GetCottageImgsDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"GetCottageImgs"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"getCottageImgs"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"headerUrl"}},{"kind":"Field","name":{"kind":"Name","value":"galleryArray"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"original"}},{"kind":"Field","name":{"kind":"Name","value":"thumbnail"}},{"kind":"Field","name":{"kind":"Name","value":"originalAlt"}},{"kind":"Field","name":{"kind":"Name","value":"thumbnailAlt"}}]}}]}}]}}]} as unknown as DocumentNode<GetCottageImgsQuery, GetCottageImgsQueryVariables>;
 export const GetAboutPgImgDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"GetAboutPgImg"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"getAboutPgImg"}}]}}]} as unknown as DocumentNode<GetAboutPgImgQuery, GetAboutPgImgQueryVariables>;
 export const GetPropertyInfoDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"GetPropertyInfo"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"propertyName"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"String"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"getPropertyInfo"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"propertyName"},"value":{"kind":"Variable","name":{"kind":"Name","value":"propertyName"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"propertyName"}},{"kind":"Field","name":{"kind":"Name","value":"propertyDescription"}},{"kind":"Field","name":{"kind":"Name","value":"amenities"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"amenityName"}},{"kind":"Field","name":{"kind":"Name","value":"amenityIconJSX"}}]}},{"kind":"Field","name":{"kind":"Name","value":"headerImgKey"}}]}}]}}]} as unknown as DocumentNode<GetPropertyInfoQuery, GetPropertyInfoQueryVariables>;
-export const GetPresignedS3UrlDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"GetPresignedS3Url"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"imgKey"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"String"}}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"commandType"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"String"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"getPresignedS3Url"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"imgKey"},"value":{"kind":"Variable","name":{"kind":"Name","value":"imgKey"}}},{"kind":"Argument","name":{"kind":"Name","value":"commandType"},"value":{"kind":"Variable","name":{"kind":"Name","value":"commandType"}}}]}]}}]} as unknown as DocumentNode<GetPresignedS3UrlQuery, GetPresignedS3UrlQueryVariables>;
+export const GetPresignedS3UrlDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"GetPresignedS3Url"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"imgKey"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"String"}}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"commandType"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"String"}}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"altTag"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"String"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"getPresignedS3Url"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"imgKey"},"value":{"kind":"Variable","name":{"kind":"Name","value":"imgKey"}}},{"kind":"Argument","name":{"kind":"Name","value":"commandType"},"value":{"kind":"Variable","name":{"kind":"Name","value":"commandType"}}},{"kind":"Argument","name":{"kind":"Name","value":"altTag"},"value":{"kind":"Variable","name":{"kind":"Name","value":"altTag"}}}]}]}}]} as unknown as DocumentNode<GetPresignedS3UrlQuery, GetPresignedS3UrlQueryVariables>;
 /** All built-in and custom scalars, mapped to their actual values */
 export type Scalars = {
   ID: { input: string; output: string; }
@@ -400,6 +403,7 @@ export type Query = {
 
 
 export type QueryGetPresignedS3UrlArgs = {
+  altTag: Scalars['String']['input'];
   commandType: Scalars['String']['input'];
   imgKey: Scalars['String']['input'];
 };
@@ -465,6 +469,7 @@ export type HomePgImgPack = {
 
 export type ImageObject = {
   __typename?: 'imageObject';
+  imgKey: Scalars['String']['output'];
   original: Scalars['String']['output'];
   originalAlt: Scalars['String']['output'];
   thumbnail: Scalars['String']['output'];
@@ -548,6 +553,7 @@ export type GetPropertyInfoQuery = { __typename?: 'Query', getPropertyInfo: { __
 export type GetPresignedS3UrlQueryVariables = Exact<{
   imgKey: Scalars['String']['input'];
   commandType: Scalars['String']['input'];
+  altTag: Scalars['String']['input'];
 }>;
 
 

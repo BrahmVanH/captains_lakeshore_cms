@@ -79,7 +79,7 @@ export const GET_PROPERTY_INFO = gql(/* GraphQL */ `
 `);
 
 export const GET_PRESEIGNED_URL = gql(/* GraphQL */ `
-	query GetPresignedS3Url($imgKey: String!, $commandType: String!) {
-		getPresignedS3Url(imgKey: $imgKey, commandType: $commandType)
+	query GetPresignedS3Url($imgKey: String!, $commandType: String!, $altTag: String!) {
+		getPresignedS3Url(imgKey: $imgKey, commandType: $commandType, altTag: $altTag)
 	}
 `);
