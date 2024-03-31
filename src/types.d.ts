@@ -1,5 +1,5 @@
 import { Image } from 'react-grid-gallery';
-import { Property } from './generated/graphql';
+import { Property } from './lib/__generated__/graphql';
 import { ImageObject } from './lib/__generated__/graphql';
 
 export interface PropertyInformation extends Property {
@@ -10,3 +10,6 @@ export interface GalImg extends ImageObject {
 	isSelected: boolean;
 }
 
+export interface IProperty extends Property {
+	headerImgKey?: string;
+}

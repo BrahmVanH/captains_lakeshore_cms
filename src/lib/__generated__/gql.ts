@@ -24,7 +24,7 @@ const documents = {
     "\n\tquery GetHideawayImgs {\n\t\tgetHideawayImgs {\n\t\t\theaderUrl\n\t\t\tgalleryArray {\n\t\t\t\timgKey\n\t\t\t\toriginal\n\t\t\t\tthumbnail\n\t\t\t\toriginalAlt\n\t\t\t\tthumbnailAlt\n\t\t\t}\n\t\t}\n\t}\n": types.GetHideawayImgsDocument,
     "\n\tquery GetCottageImgs {\n\t\tgetCottageImgs {\n\t\t\theaderUrl\n\t\t\tgalleryArray {\n\t\t\t\toriginal\n\t\t\t\tthumbnail\n\t\t\t\toriginalAlt\n\t\t\t\tthumbnailAlt\n\t\t\t}\n\t\t}\n\t}\n": types.GetCottageImgsDocument,
     "\n\tquery GetAboutPgImg {\n\t\tgetAboutPgImg\n\t}\n": types.GetAboutPgImgDocument,
-    "\n\tquery GetPropertyInfo($propertyName: String!) {\n\t\tgetPropertyInfo(propertyName: $propertyName) {\n\t\t\tpropertyName\n\t\t\tpropertyDescription\n\t\t\tamenities {\n\t\t\t\tamenityName\n\t\t\t\tamenityIconJSX\n\t\t\t}\n\t\t\theaderImgKey\n\t\t}\n\t}\n": types.GetPropertyInfoDocument,
+    "\n\tquery GetPropertyInfo {\n\t\tgetPropertyInfo {\n\t\t\tpropertyName\n\t\t\tpropertyDescription\n\t\t\tamenities {\n\t\t\t\tamenityName\n\t\t\t\tamenityType\n\t\t\t\n\t\t\t}\n\t\t\theaderImgKey\n\t\t}\n\t}\n": types.GetPropertyInfoDocument,
     "\n\tquery GetPresignedS3Url($imgKey: String!, $commandType: String!, $altTag: String!) {\n\t\tgetPresignedS3Url(imgKey: $imgKey, commandType: $commandType, altTag: $altTag)\n\t}\n": types.GetPresignedS3UrlDocument,
 };
 
@@ -89,7 +89,7 @@ export function gql(source: "\n\tquery GetAboutPgImg {\n\t\tgetAboutPgImg\n\t}\n
 /**
  * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
-export function gql(source: "\n\tquery GetPropertyInfo($propertyName: String!) {\n\t\tgetPropertyInfo(propertyName: $propertyName) {\n\t\t\tpropertyName\n\t\t\tpropertyDescription\n\t\t\tamenities {\n\t\t\t\tamenityName\n\t\t\t\tamenityIconJSX\n\t\t\t}\n\t\t\theaderImgKey\n\t\t}\n\t}\n"): (typeof documents)["\n\tquery GetPropertyInfo($propertyName: String!) {\n\t\tgetPropertyInfo(propertyName: $propertyName) {\n\t\t\tpropertyName\n\t\t\tpropertyDescription\n\t\t\tamenities {\n\t\t\t\tamenityName\n\t\t\t\tamenityIconJSX\n\t\t\t}\n\t\t\theaderImgKey\n\t\t}\n\t}\n"];
+export function gql(source: "\n\tquery GetPropertyInfo {\n\t\tgetPropertyInfo {\n\t\t\tpropertyName\n\t\t\tpropertyDescription\n\t\t\tamenities {\n\t\t\t\tamenityName\n\t\t\t\tamenityType\n\t\t\t\n\t\t\t}\n\t\t\theaderImgKey\n\t\t}\n\t}\n"): (typeof documents)["\n\tquery GetPropertyInfo {\n\t\tgetPropertyInfo {\n\t\t\tpropertyName\n\t\t\tpropertyDescription\n\t\t\tamenities {\n\t\t\t\tamenityName\n\t\t\t\tamenityType\n\t\t\t\n\t\t\t}\n\t\t\theaderImgKey\n\t\t}\n\t}\n"];
 /**
  * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */

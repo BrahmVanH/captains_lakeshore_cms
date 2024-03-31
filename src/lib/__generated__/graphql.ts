@@ -18,13 +18,13 @@ export type Scalars = {
 
 export type Amenity = {
   __typename?: 'Amenity';
-  amenityIconJSX: Scalars['String']['output'];
   amenityName: Scalars['String']['output'];
+  amenityType: Scalars['String']['output'];
 };
 
 export type AmenityInput = {
-  amenityIconJSX: Scalars['String']['input'];
   amenityName: Scalars['String']['input'];
+  amenityType: Scalars['String']['input'];
 };
 
 export type Auth = {
@@ -114,8 +114,8 @@ export type Query = {
   getHideawayImgs: HideawayImgPack;
   getHomePgImgs: HomePgImgPack;
   getPresignedS3Url: Scalars['String']['output'];
-  getPropertyInfo: Property;
-  queryBookingsByProperty?: Maybe<Array<Booking>>;
+  getPropertyInfo: Array<Property>;
+  queryBookingsByProperty: Array<Booking>;
 };
 
 
@@ -123,11 +123,6 @@ export type QueryGetPresignedS3UrlArgs = {
   altTag: Scalars['String']['input'];
   commandType: Scalars['String']['input'];
   imgKey: Scalars['String']['input'];
-};
-
-
-export type QueryGetPropertyInfoArgs = {
-  propertyName: Scalars['String']['input'];
 };
 
 
@@ -238,7 +233,7 @@ export type QueryBookingsByPropertyQueryVariables = Exact<{
 }>;
 
 
-export type QueryBookingsByPropertyQuery = { __typename?: 'Query', queryBookingsByProperty?: Array<{ __typename?: 'Booking', _id: string, dateValue: string, propertyName: string }> | null };
+export type QueryBookingsByPropertyQuery = { __typename?: 'Query', queryBookingsByProperty: Array<{ __typename?: 'Booking', _id: string, dateValue: string, propertyName: string }> };
 
 export type GetHomePgImgsQueryVariables = Exact<{ [key: string]: never; }>;
 
@@ -260,12 +255,10 @@ export type GetAboutPgImgQueryVariables = Exact<{ [key: string]: never; }>;
 
 export type GetAboutPgImgQuery = { __typename?: 'Query', getAboutPgImg: string };
 
-export type GetPropertyInfoQueryVariables = Exact<{
-  propertyName: Scalars['String']['input'];
-}>;
+export type GetPropertyInfoQueryVariables = Exact<{ [key: string]: never; }>;
 
 
-export type GetPropertyInfoQuery = { __typename?: 'Query', getPropertyInfo: { __typename?: 'Property', propertyName: string, propertyDescription: string, headerImgKey: string, amenities?: Array<{ __typename?: 'Amenity', amenityName: string, amenityIconJSX: string }> | null } };
+export type GetPropertyInfoQuery = { __typename?: 'Query', getPropertyInfo: Array<{ __typename?: 'Property', propertyName: string, propertyDescription: string, headerImgKey: string, amenities?: Array<{ __typename?: 'Amenity', amenityName: string, amenityType: string }> | null }> };
 
 export type GetPresignedS3UrlQueryVariables = Exact<{
   imgKey: Scalars['String']['input'];
@@ -288,7 +281,7 @@ export const GetHomePgImgsDocument = {"kind":"Document","definitions":[{"kind":"
 export const GetHideawayImgsDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"GetHideawayImgs"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"getHideawayImgs"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"headerUrl"}},{"kind":"Field","name":{"kind":"Name","value":"galleryArray"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"imgKey"}},{"kind":"Field","name":{"kind":"Name","value":"original"}},{"kind":"Field","name":{"kind":"Name","value":"thumbnail"}},{"kind":"Field","name":{"kind":"Name","value":"originalAlt"}},{"kind":"Field","name":{"kind":"Name","value":"thumbnailAlt"}}]}}]}}]}}]} as unknown as DocumentNode<GetHideawayImgsQuery, GetHideawayImgsQueryVariables>;
 export const GetCottageImgsDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"GetCottageImgs"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"getCottageImgs"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"headerUrl"}},{"kind":"Field","name":{"kind":"Name","value":"galleryArray"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"original"}},{"kind":"Field","name":{"kind":"Name","value":"thumbnail"}},{"kind":"Field","name":{"kind":"Name","value":"originalAlt"}},{"kind":"Field","name":{"kind":"Name","value":"thumbnailAlt"}}]}}]}}]}}]} as unknown as DocumentNode<GetCottageImgsQuery, GetCottageImgsQueryVariables>;
 export const GetAboutPgImgDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"GetAboutPgImg"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"getAboutPgImg"}}]}}]} as unknown as DocumentNode<GetAboutPgImgQuery, GetAboutPgImgQueryVariables>;
-export const GetPropertyInfoDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"GetPropertyInfo"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"propertyName"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"String"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"getPropertyInfo"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"propertyName"},"value":{"kind":"Variable","name":{"kind":"Name","value":"propertyName"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"propertyName"}},{"kind":"Field","name":{"kind":"Name","value":"propertyDescription"}},{"kind":"Field","name":{"kind":"Name","value":"amenities"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"amenityName"}},{"kind":"Field","name":{"kind":"Name","value":"amenityIconJSX"}}]}},{"kind":"Field","name":{"kind":"Name","value":"headerImgKey"}}]}}]}}]} as unknown as DocumentNode<GetPropertyInfoQuery, GetPropertyInfoQueryVariables>;
+export const GetPropertyInfoDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"GetPropertyInfo"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"getPropertyInfo"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"propertyName"}},{"kind":"Field","name":{"kind":"Name","value":"propertyDescription"}},{"kind":"Field","name":{"kind":"Name","value":"amenities"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"amenityName"}},{"kind":"Field","name":{"kind":"Name","value":"amenityType"}}]}},{"kind":"Field","name":{"kind":"Name","value":"headerImgKey"}}]}}]}}]} as unknown as DocumentNode<GetPropertyInfoQuery, GetPropertyInfoQueryVariables>;
 export const GetPresignedS3UrlDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"GetPresignedS3Url"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"imgKey"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"String"}}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"commandType"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"String"}}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"altTag"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"String"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"getPresignedS3Url"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"imgKey"},"value":{"kind":"Variable","name":{"kind":"Name","value":"imgKey"}}},{"kind":"Argument","name":{"kind":"Name","value":"commandType"},"value":{"kind":"Variable","name":{"kind":"Name","value":"commandType"}}},{"kind":"Argument","name":{"kind":"Name","value":"altTag"},"value":{"kind":"Variable","name":{"kind":"Name","value":"altTag"}}}]}]}}]} as unknown as DocumentNode<GetPresignedS3UrlQuery, GetPresignedS3UrlQueryVariables>;
 /** All built-in and custom scalars, mapped to their actual values */
 // export type Scalars = {
@@ -301,13 +294,13 @@ export const GetPresignedS3UrlDocument = {"kind":"Document","definitions":[{"kin
 
 // export type Amenity = {
 //   __typename?: 'Amenity';
-//   amenityIconJSX: Scalars['String']['output'];
 //   amenityName: Scalars['String']['output'];
+//   amenityType: Scalars['String']['output'];
 // };
 
 // export type AmenityInput = {
-//   amenityIconJSX: Scalars['String']['input'];
 //   amenityName: Scalars['String']['input'];
+//   amenityType: Scalars['String']['input'];
 // };
 
 // export type Auth = {
@@ -397,8 +390,8 @@ export const GetPresignedS3UrlDocument = {"kind":"Document","definitions":[{"kin
 //   getHideawayImgs: HideawayImgPack;
 //   getHomePgImgs: HomePgImgPack;
 //   getPresignedS3Url: Scalars['String']['output'];
-//   getPropertyInfo: Property;
-//   queryBookingsByProperty?: Maybe<Array<Booking>>;
+//   getPropertyInfo: Array<Property>;
+//   queryBookingsByProperty: Array<Booking>;
 // };
 
 
@@ -406,11 +399,6 @@ export const GetPresignedS3UrlDocument = {"kind":"Document","definitions":[{"kin
 //   altTag: Scalars['String']['input'];
 //   commandType: Scalars['String']['input'];
 //   imgKey: Scalars['String']['input'];
-// };
-
-
-// export type QueryGetPropertyInfoArgs = {
-//   propertyName: Scalars['String']['input'];
 // };
 
 
@@ -521,7 +509,7 @@ export const GetPresignedS3UrlDocument = {"kind":"Document","definitions":[{"kin
 // }>;
 
 
-// export type QueryBookingsByPropertyQuery = { __typename?: 'Query', queryBookingsByProperty?: Array<{ __typename?: 'Booking', _id: string, dateValue: string, propertyName: string }> | null };
+// export type QueryBookingsByPropertyQuery = { __typename?: 'Query', queryBookingsByProperty: Array<{ __typename?: 'Booking', _id: string, dateValue: string, propertyName: string }> };
 
 // export type GetHomePgImgsQueryVariables = Exact<{ [key: string]: never; }>;
 
@@ -543,12 +531,10 @@ export const GetPresignedS3UrlDocument = {"kind":"Document","definitions":[{"kin
 
 // export type GetAboutPgImgQuery = { __typename?: 'Query', getAboutPgImg: string };
 
-// export type GetPropertyInfoQueryVariables = Exact<{
-//   propertyName: Scalars['String']['input'];
-// }>;
+// export type GetPropertyInfoQueryVariables = Exact<{ [key: string]: never; }>;
 
 
-// export type GetPropertyInfoQuery = { __typename?: 'Query', getPropertyInfo: { __typename?: 'Property', propertyName: string, propertyDescription: string, headerImgKey: string, amenities?: Array<{ __typename?: 'Amenity', amenityName: string, amenityIconJSX: string }> | null } };
+// export type GetPropertyInfoQuery = { __typename?: 'Query', getPropertyInfo: Array<{ __typename?: 'Property', propertyName: string, propertyDescription: string, headerImgKey: string, amenities?: Array<{ __typename?: 'Amenity', amenityName: string, amenityType: string }> | null }> };
 
 // export type GetPresignedS3UrlQueryVariables = Exact<{
 //   imgKey: Scalars['String']['input'];

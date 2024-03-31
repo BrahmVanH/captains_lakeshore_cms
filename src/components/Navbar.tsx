@@ -63,7 +63,7 @@ function Navbar() {
 					)}
 				</div>
 			</nav>
-			<div id='navbar-dropdown' className='hidden .flex .items-center .flex-col .m-auto .w-full .border .rounded-bl-lg .rounded-br-lg .bg-blue-500 .text-white .absolute .z-50'>
+			<div id='navbar-dropdown' hidden className='  .flex .items-center .flex-col .m-auto .w-full .border .rounded-bl-lg .rounded-br-lg .bg-blue-500 .text-white .absolute .z-50'>
 				<a href={'/'} className='navbar-link'>
 					Home
 				</a>

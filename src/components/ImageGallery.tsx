@@ -59,9 +59,8 @@ export default function ImageGallery({ galleryArray }: { galleryArray: GalImg[] 
 		setSelectedImages(selectedImages);
 	}, [formattedGalArr, hasSelected]);
 
-	const handleDeleteSelected = useCallback( async () => {
+	const handleDeleteSelected = useCallback(async () => {
 		try {
-
 			if (selectedImages.length < 1) return;
 			if (!selectedImages[0].key) return;
 			console.log('selectedImages:', selectedImages);
@@ -84,14 +83,12 @@ export default function ImageGallery({ galleryArray }: { galleryArray: GalImg[] 
 				throw new Error('Error deleting image');
 			}
 
-			
-
 			console.log('Image deleted successfully', data);
 		} catch (error) {
 			console.error(error);
 			throw new Error('Error deleting image');
 		}
-		}, [selectedImages]);
+	}, [selectedImages]);
 
 	useEffect(() => {
 		console.log('formattedGalArr:', formattedGalArr);
@@ -105,17 +102,26 @@ export default function ImageGallery({ galleryArray }: { galleryArray: GalImg[] 
 		console.log('selectedImages:', selectedImages);
 	}, [selectedImages]);
 
+
+
+	const galleryViewportStyles: React.CSSProperties = {
+		maxHeight: 'calc(3 * (100px + 10px))',
+		overflowY: 'scroll',
+	};
+
 	return (
-		<>
+		<div id='imageGallery' style={{width: '100%'}}>
 			{formattedGalArr ? (
 				<>
 					<button onClick={handleSelectAll}>Select All</button>
 					<button onClick={handleDeleteSelected}>Delete Selected</button>
-					<Gallery images={formattedGalArr} onSelect={handleSelect} rowHeight={300} />{' '}
+					<div style={galleryViewportStyles}>
+						<Gallery images={formattedGalArr} onSelect={handleSelect} rowHeight={100} defaultContainerWidth={50} />
+					</div>
 				</>
 			) : (
 				<></>
 			)}
-		</>
+		</div>
 	);
 }
