@@ -16,12 +16,14 @@ const LoginCard = styled.div`
 	display: flex;
 	flex-direction: column;
 	align-items: center;
+	background-color: white;
+	border-radius: 6px;
 
 	@media (min-width: 1024px) {
 		width: 33.33%;
 	}
 	@media (min-width: 768px) {
-		width: 50%;
+		width: 30%;
 	}
 	@media (max-width: 480px) {
 		width: calc(11 / 12);
@@ -74,8 +76,9 @@ const AlertMessage = styled.p`
 const ButtonS = styled(Button)(
 	({ theme }) => `
 	margin: 0.5rem !important;
-	color: black !important;
+	color: white !important;
 	border-color: ${theme.secondary} !important;
+	background-color: ${theme.primary} !important;
 `
 );
 
@@ -142,7 +145,7 @@ export default function Login() {
 	return (
 		<LoginCard>
 			<HeaderContainer>
-				<h3 style={{ textAlign: 'center', paddingTop: '1rem' }}>Login</h3>
+				<h2 style={{ textAlign: 'center', paddingTop: '1rem' }}>Login</h2>
 			</HeaderContainer>
 			<Form ref={form} onSubmit={handleSubmit((data) => setInput(data))}>
 				<Input autoComplete='username' type='text' minLength={5} maxLength={25} placeholder='username' {...register('username', { required: true })} />

@@ -6,6 +6,15 @@ import { useQuery } from '@apollo/client';
 import { GET_PROPERTY_INFO } from '../lib/queries';
 import { Property } from '../lib/__generated__/graphql';
 import Card from '../components/Card';
+import styled from 'styled-components';
+
+const LoginCardContainer = styled.div`
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	margin-top: 2rem;
+	width: 100%;
+`;
 
 export default function Dashboard() {
 	const [propertyInfo, setPropertyInfo] = useState<Property[] | null>(null);
@@ -43,7 +52,10 @@ export default function Dashboard() {
 					)}
 				</>
 			) : (
+				<LoginCardContainer>
+
 				<Login />
+				</LoginCardContainer>
 			)}
 		</>
 	);
