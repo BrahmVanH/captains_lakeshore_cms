@@ -4,6 +4,8 @@ import { HashRouter as Router, Routes, Route } from 'react-router-dom';
 import { ThemeProvider } from 'styled-components';
 import Navbar from './components/Navbar';
 import Dashboard from './pages/Dashboard';
+import SideMenu from './components/SideMenu';
+import EditPhotos from './pages/EditPhotos';
 
 
 
@@ -28,6 +30,7 @@ function App() {
 					<Navbar />
 					<Routes>
 						<Route path='/' element={<Dashboard />} />
+						<Route path='/photos/:property' element={<EditPhotos />} />
 					</Routes>
 				</ThemeProvider>
 			</ApolloProvider>

@@ -4,10 +4,10 @@ import { LOGIN_USER } from '../lib/mutations';
 import { useForm, FieldValues } from 'react-hook-form';
 import * as Auth from '../lib/auth';
 import styled from 'styled-components';
+import { Button } from 'evergreen-ui';
 
 import { LoginUserInput } from '../lib/__generated__/graphql';
 
-import { Button } from '@mui/material';
 
 const LoginCard = styled.div`
 	height: min-content;
@@ -71,11 +71,19 @@ const AlertMessage = styled.p`
 	margin: 0.25rem;
 `;
 
-const ButtonS = styled(Button)(({ theme }) => ({
-	margin: '0.5rem !important',
-	color: `black !important`,
-	borderColor: `${theme.secondary} !important`,
-}));
+const ButtonS = styled(Button)(
+	({ theme }) => `
+	margin: 0.5rem !important;
+	color: black !important;
+	border-color: ${theme.secondary} !important;
+`
+);
+
+// ({
+// 	margin: '0.5rem !important',
+// 	color: `black !important`,
+// 	borderColor: `${theme.secondary} !important`,
+// }));
 
 export default function Login() {
 	const {

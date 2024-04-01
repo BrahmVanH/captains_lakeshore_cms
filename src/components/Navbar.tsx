@@ -1,9 +1,43 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import * as Auth from '../lib/auth';
 import { RxHamburgerMenu } from 'react-icons/rx';
-
+import { Link } from 'react-router-dom';
 import mobileLogoSvg from '../assets/logo.svg';
 import logoSvg from '../assets/log_no_trees.svg';
+import styled from 'styled-components';
+
+const Nav = styled.nav(
+	({ theme }) => `
+	width: 100%;
+	display: flex;
+	flex-direction: row;
+	justify-content: space-between;
+	align-items: center;
+	max-height: min-content;
+	border-bottom: 5px solid ${theme.secondary};
+	z-index: 20;
+	width: 100%;
+	background-color: white;
+	`
+);
+
+const DropdownBtn = styled.button`
+	background-color: transparent;
+	border: none;
+	box-shadow: none;
+`;
+
+const LinkContainer = styled.div`
+	display: flex;
+	justify-content: space-around;
+	padding: 0.5rem 2rem;
+`;
+
+const StyledLink = styled(Link)`
+	color: black;
+	text-decoration: none;
+	padding: 1rem;
+`;
 
 function Navbar() {
 	const [mobileViewport, setMobileViewport] = useState(false);
@@ -12,8 +46,16 @@ function Navbar() {
 		width: 100,
 	});
 
+	const dropdownMenu = useRef<HTMLDivElement>(null);
+
 	const isMediumViewport = () => {
 		return window.innerWidth < 766;
+	};
+
+	const toggleDropDown = (event: any) => {
+		event.preventDefault();
+
+		dropdownMenu.current?.classList.toggle('hidden');
 	};
 
 	useEffect(() => {
@@ -32,51 +74,49 @@ function Navbar() {
 
 	return (
 		<>
-			<nav className=''>
-				<div className='.flex .justify-between .p-2'>
-					<a className='' href={'/'}>
-						<img alt='Captains Lake Superior branding' src={brandLogo.image} width={brandLogo.width} />
-					</a>
-					{mobileViewport ? (
-						<button data-collapse-toggle='navbar-dropdown' type='button' className='.bg-transparent .border-none .shadow-none' aria-controls='navbar-dropdown' aria-expanded='false'>
-							<RxHamburgerMenu size={'20px'} />
-						</button>
-					) : (
-						<div className='link-container'>
-							<a href={'/'} className='navbar-link'>
-								Home
-							</a>
-							<a href={'/about'} className='navbar-link'>
-								About Us
-							</a>
-							<a href={'/contact'} className='navbar-link'>
-								Contact
-							</a>
-							{Auth.loggedIn() ? (
-								<a href='/' onClick={() => Auth.logout()} className='navbar-link'>
-									Log Out
-								</a>
-							) : (
-								<></>
-							)}
-						</div>
-					)}
-				</div>
-			</nav>
-			<div id='navbar-dropdown' hidden className='  .flex .items-center .flex-col .m-auto .w-full .border .rounded-bl-lg .rounded-br-lg .bg-blue-500 .text-white .absolute .z-50'>
-				<a href={'/'} className='navbar-link'>
+			<Nav className=''>
+				<StyledLink className='' to={'/'}>
+					<img alt='Captains Lake Superior branding' src={brandLogo.image} width={brandLogo.width} />
+				</StyledLink>
+				{mobileViewport ? (
+					<DropdownBtn onClick={toggleDropDown} data-collapse-toggle='navbar-dropdown' type='button' aria-controls='navbar-dropdown' aria-expanded='false'>
+						<RxHamburgerMenu size={'20px'} />
+					</DropdownBtn>
+				) : (
+					<LinkContainer>
+						<StyledLink to={'/'} className='navbar-link'>
+							Home
+						</StyledLink>
+						<StyledLink to={'/about'} className='navbar-link'>
+							About Us
+						</StyledLink>
+						<StyledLink to={'/contact'} className='navbar-link'>
+							Contact
+						</StyledLink>
+						{Auth.loggedIn() ? (
+							<StyledLink to='/' onClick={() => Auth.logout()} className='navbar-link'>
+								Log Out
+							</StyledLink>
+						) : (
+							<></>
+						)}
+					</LinkContainer>
+				)}
+			</Nav>
+			<div ref={dropdownMenu} id='navbar-dropdown' className=' hidden .flex .items-center .flex-col .m-auto .w-full .border .rounded-bl-lg .rounded-br-lg .bg-blue-500 .text-white .absolute .z-50'>
+				<StyledLink to={'/'} className='navbar-link'>
 					Home
-				</a>
-				<a href={'/about'} className='navbar-link'>
+				</StyledLink>
+				<StyledLink to={'/about'} className='navbar-link'>
 					About Us
-				</a>
-				<a href={'/contact'} className='navbar-link'>
+				</StyledLink>
+				<StyledLink to={'/contact'} className='navbar-link'>
 					Contact
-				</a>
+				</StyledLink>
 				{Auth.loggedIn() ? (
-					<a href='/' onClick={() => Auth.logout()} className='navbar-link'>
+					<StyledLink to='/' onClick={() => Auth.logout()} className='navbar-link'>
 						Log Out
-					</a>
+					</StyledLink>
 				) : (
 					<></>
 				)}

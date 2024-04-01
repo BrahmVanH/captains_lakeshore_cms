@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { Gallery, Image } from 'react-grid-gallery';
 // import { useMutation } from '@apollo/client';
 // import { DELETE_IMAGES } from '../lib/mutations';
@@ -6,11 +6,23 @@ import { GalImg } from '../types';
 import { useLazyQuery } from '@apollo/client';
 import { GET_PRESEIGNED_URL } from '../lib/queries';
 import { deleteImgFromS3 } from '../lib/s3';
+import { Button, EditIcon } from 'evergreen-ui';
 
-export default function ImageGallery({ galleryArray }: { galleryArray: GalImg[] }) {
+export default function ImageGallery({
+	displayBtns,
+	galleryArray,
+	rowHeight,
+	galleryViewportStyle,
+}: {
+	displayBtns: boolean;
+	galleryArray: GalImg[];
+	rowHeight: number;
+	galleryViewportStyle: React.CSSProperties;
+}) {
 	const [formattedGalArr, setFormattedGalArr] = useState<Image[] | null>(null);
 	const [selectedImages, setSelectedImages] = useState<Image[]>([]);
 	const hasSelected = galleryArray.some((img) => img.isSelected);
+	const btnsRef = useRef<HTMLButtonElement>(null);
 
 	const [deleteImages] = useLazyQuery(GET_PRESEIGNED_URL);
 
@@ -28,6 +40,14 @@ export default function ImageGallery({ galleryArray }: { galleryArray: GalImg[] 
 
 		setFormattedGalArr(formattedImages);
 	}, [galleryArray]);
+
+	useEffect(() => {
+		if (displayBtns) {
+			btnsRef.current?.classList.remove('hidden');
+		} else {
+			btnsRef.current?.classList.add('hidden');
+		}
+	}, [displayBtns]);
 
 	const handleSelect = useCallback(
 		(index: number) => {
@@ -102,22 +122,21 @@ export default function ImageGallery({ galleryArray }: { galleryArray: GalImg[] 
 		console.log('selectedImages:', selectedImages);
 	}, [selectedImages]);
 
-
-
-	const galleryViewportStyles: React.CSSProperties = {
-		maxHeight: 'calc(3 * (100px + 10px))',
-		overflowY: 'scroll',
-	};
-
 	return (
-		<div id='imageGallery' style={{width: '100%'}}>
+		<div id='imageGallery'>
 			{formattedGalArr ? (
 				<>
-					<button onClick={handleSelectAll}>Select All</button>
-					<button onClick={handleDeleteSelected}>Delete Selected</button>
-					<div style={galleryViewportStyles}>
-						<Gallery images={formattedGalArr} onSelect={handleSelect} rowHeight={100} defaultContainerWidth={50} />
+					<div style={galleryViewportStyle}>
+						<Gallery images={formattedGalArr} onSelect={handleSelect} rowHeight={rowHeight} defaultContainerWidth={50} />
 					</div>
+					{/* <div style={{ display: 'flex', flexDirection: 'row', justifyContent: 'center', alignItems: 'center', padding: '1rem' }}>
+						<Button ref={btnsRef} onClick={handleSelectAll} className='hidden'>
+						Select All
+						</Button>
+						<Button ref={btnsRef} onClick={handleDeleteSelected} className='hidden'>
+						Delete Selected
+						</Button>
+					</div> */}
 				</>
 			) : (
 				<></>

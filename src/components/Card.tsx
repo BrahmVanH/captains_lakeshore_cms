@@ -3,20 +3,70 @@ import { useEffect, useCallback, useState } from 'react';
 import { useLazyQuery } from '@apollo/client';
 import { GET_HIDEAWAY_IMGS, GET_COTTAGE_IMGS } from '../lib/queries';
 
-import { Button, EditIcon } from 'evergreen-ui';
+import { Button, EditIcon, Overlay } from 'evergreen-ui';
 
 import ImageGallery from './ImageGallery';
 
-import { Amenity, Property } from '../lib/__generated__/graphql';
 import { GalImg, IProperty } from '../types';
+import styled from 'styled-components';
+import ImgGalOverlay from './ImgGalOverlay';
+import { Link } from 'react-router-dom';
+
+const StyledCard = styled.div`
+	width: 80%;
+	margin-bottom: 2rem;
+	background-color: white;
+	padding: 1rem;
+`;
+const CardContainer = styled.div`
+	display: flex;
+	flex-direction: row;
+	justify-content: space-around;
+`;
+
+const TitleContainer = styled.div(
+	({ theme }) => `
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	justify-content: flex-start;
+	padding-right: 2rem;
+	margin: 2rem 0rem 2rem 2rem;
+	border-right: 3px solid transparent;
+	border-image-source: linear-gradient(${theme.primaryStroke});
+	border-image-slice: 1;
+	border-image-outset: 0;
+	border-image-repeat: stretch;
+	`
+);
+const ImgGalContainer = styled.div`
+	width: 60%;
+	margin: 2rem 2rem 2rem 0rem;
+`;
+const BtnContainer = styled.div`
+	display: flex;
+	flex-direction: column;
+	justify-content: flex-start;
+	align-items: center;
+`;
+
+const StyledBtn = styled(Button)`
+	margin-bottom: 1rem;
+`;
 
 export default function Card({ propertyName, propertyDescription, amenities }: IProperty) {
 	const [galleryArray, setGalleryArray] = useState<GalImg[] | null>([]);
 	const [loading, setLoading] = useState<boolean>(false);
 	const [error, setError] = useState<any>(null);
 	const [data, setData] = useState<any>(null);
+	const [showOverlay, setShowOverlay] = useState<boolean>(false);
 	const [getCottageImages] = useLazyQuery(GET_COTTAGE_IMGS);
 	const [getHideawayImages] = useLazyQuery(GET_HIDEAWAY_IMGS);
+
+	const galleryViewportStyles: React.CSSProperties = {
+		maxHeight: 'calc(3 * (100px + 10px))',
+		overflowY: 'scroll',
+	};
 
 	// useEffect(() => {
 	// 	if (data?.getPropertyInfo) {
@@ -35,6 +85,10 @@ export default function Card({ propertyName, propertyDescription, amenities }: I
 	useEffect(() => {
 		console.log('amenities:', amenities);
 	}, [amenities]);
+
+	const handleShowOverlay = useCallback(() => {
+		setShowOverlay(!showOverlay);
+	}, [showOverlay]);
 
 	const handleFetchImgs = useCallback(
 		async (propertyName: string) => {
@@ -80,30 +134,33 @@ export default function Card({ propertyName, propertyDescription, amenities }: I
 		}
 	}, [error]);
 	return (
-		<div id='card' style={{ width: '80%', marginBottom: '2rem' }}>
+		<StyledCard id='card'>
+			{galleryArray && !loading ? <ImgGalOverlay galleryArray={galleryArray} isShown={showOverlay} /> : <></>}
 			{propertyName && propertyDescription && amenities ? (
-				<div style={{ display: 'flex', flexDirection: 'row' }}>
-					<div style={{ display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center' }}>
+				<CardContainer>
+					<TitleContainer>
 						<div>
 							<h1>{propertyName}</h1>
 						</div>
-						<div style={{ display: 'flex', flexDirection: 'column', justifyContent: 'start', alignItems: 'center' }}>
-							<Button iconBefore={EditIcon}>Edit Property Name</Button>
-							<Button iconBefore={EditIcon}>Edit Description</Button>
-							<Button iconBefore={EditIcon}>Edit Photos</Button>
-						</div>
-					</div>
+						<BtnContainer>
+							<StyledBtn iconBefore={EditIcon}>Property Name</StyledBtn>
+							<StyledBtn iconBefore={EditIcon}>Description</StyledBtn>
+							<Link to={`/photos/${propertyName}`} state={propertyName}>
+								<StyledBtn iconBefore={EditIcon}>Photos</StyledBtn>
+							</Link>
+						</BtnContainer>
+					</TitleContainer>
 					{galleryArray && !loading ? (
-						<div style={{ width: '60%' }}>
-							<ImageGallery galleryArray={galleryArray} />
-						</div>
+						<ImgGalContainer>
+							<ImageGallery galleryViewportStyle={galleryViewportStyles} rowHeight={100} displayBtns={false} galleryArray={galleryArray} />
+						</ImgGalContainer>
 					) : (
 						<h2>Loading Images</h2>
 					)}
-				</div>
+				</CardContainer>
 			) : (
 				<></>
 			)}
-		</div>
+		</StyledCard>
 	);
 }
