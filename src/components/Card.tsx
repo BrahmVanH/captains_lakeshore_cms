@@ -54,7 +54,7 @@ const StyledBtn = styled(Button)`
 	margin-bottom: 1rem;
 `;
 
-export default function Card({ propertyName, propertyDescription, amenities }: IProperty) {
+export default function Card({ propertyName, propertyDescription, amenities }: Readonly<IProperty>) {
 	const [galleryArray, setGalleryArray] = useState<GalImg[] | null>([]);
 	const [loading, setLoading] = useState<boolean>(false);
 	const [error, setError] = useState<any>(null);
@@ -145,7 +145,7 @@ export default function Card({ propertyName, propertyDescription, amenities }: I
 						<BtnContainer>
 							<StyledBtn iconBefore={EditIcon}>Property Name</StyledBtn>
 							<StyledBtn iconBefore={EditIcon}>Description</StyledBtn>
-							<Link to={`/photos/${propertyName}`} state={propertyName}>
+							<Link to={`/photos/${propertyName}`} state={{ propertyName: propertyName }}>
 								<StyledBtn iconBefore={EditIcon}>Photos</StyledBtn>
 							</Link>
 						</BtnContainer>

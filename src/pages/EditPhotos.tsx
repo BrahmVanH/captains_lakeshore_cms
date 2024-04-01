@@ -1,19 +1,22 @@
-import { useParams } from 'react-router-dom';
+import { useParams, useLocation } from 'react-router-dom';
 import ImageGallery from '../components/ImageGallery';
 import SideMenu from '../components/SideMenu';
-import { useCallback, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { useLazyQuery } from '@apollo/client';
 import { GET_COTTAGE_IMGS, GET_HIDEAWAY_IMGS } from '../lib/queries';
 import { GalImg } from '../types';
 
 export default function EditPhotos() {
-	const { propertyName } = useParams<{ propertyName: string }>();
 
-  const [galleryArray, setGalleryArray] = useState<any>([]);
-  const [error, setError] = useState<any>(null);
+	// const { propertyName } = useParams<{ propertyName: string }>();
+	const location = useLocation();
+	const { propertyName } = location.state as { propertyName: string };
 
-  const [getHideawayImages] = useLazyQuery(GET_HIDEAWAY_IMGS);
-  const [getCottageImages] = useLazyQuery(GET_COTTAGE_IMGS);
+	const [galleryArray, setGalleryArray] = useState<any>([]);
+	const [error, setError] = useState<any>(null);
+
+	const [getHideawayImages] = useLazyQuery(GET_HIDEAWAY_IMGS);
+	const [getCottageImages] = useLazyQuery(GET_COTTAGE_IMGS);
 
 	const galleryViewportStyle: React.CSSProperties = {
 		margin: 'auto',
@@ -22,7 +25,6 @@ export default function EditPhotos() {
 		maxHeight: '80vh',
 	};
 
-  
 	const handleFetchImgs = useCallback(
 		async (propertyName: string) => {
 			console.log('fetching images');
@@ -54,6 +56,18 @@ export default function EditPhotos() {
 		},
 		[propertyName]
 	);
+
+	useEffect(() => {
+		if (propertyName) {
+			console.log('property name:', propertyName);
+		}
+	}, [propertyName]);
+
+	useEffect(() => {
+		if (propertyName) {
+			handleFetchImgs(propertyName);
+		}
+	}, [propertyName, handleFetchImgs]);
 	return (
 		<div>
 			<SideMenu />

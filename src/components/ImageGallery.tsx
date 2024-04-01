@@ -123,7 +123,7 @@ export default function ImageGallery({
 	}, [selectedImages]);
 
 	return (
-		<div id='imageGallery'>
+		<div id='imageGallery' style={{maxHeight: '100vh'}}>
 			{formattedGalArr ? (
 				<>
 					<div style={galleryViewportStyle}>

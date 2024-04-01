@@ -16,7 +16,6 @@ const Nav = styled.nav(
 	max-height: min-content;
 	border-bottom: 5px solid ${theme.secondary};
 	z-index: 20;
-	width: 100%;
 	background-color: white;
 	`
 );
@@ -73,36 +72,34 @@ function Navbar() {
 	}, []);
 
 	return (
-		<>
-			<Nav className=''>
-				<StyledLink className='' to={'/'}>
-					<img alt='Captains Lake Superior branding' src={brandLogo.image} width={brandLogo.width} />
-				</StyledLink>
-				{mobileViewport ? (
-					<DropdownBtn onClick={toggleDropDown} data-collapse-toggle='navbar-dropdown' type='button' aria-controls='navbar-dropdown' aria-expanded='false'>
-						<RxHamburgerMenu size={'20px'} />
-					</DropdownBtn>
-				) : (
-					<LinkContainer>
-						<StyledLink to={'/'} className='navbar-link'>
-							Home
+		<Nav className=''>
+			<StyledLink className='' to={'/'}>
+				<img alt='Captains Lake Superior branding' src={brandLogo.image} width={brandLogo.width} />
+			</StyledLink>
+			{mobileViewport ? (
+				<DropdownBtn onClick={toggleDropDown} data-collapse-toggle='navbar-dropdown' type='button' aria-controls='navbar-dropdown' aria-expanded='false'>
+					<RxHamburgerMenu size={'20px'} />
+				</DropdownBtn>
+			) : (
+				<LinkContainer>
+					<StyledLink to={'/'} className='navbar-link'>
+						Home
+					</StyledLink>
+					<StyledLink to={'/about'} className='navbar-link'>
+						About Us
+					</StyledLink>
+					<StyledLink to={'/contact'} className='navbar-link'>
+						Contact
+					</StyledLink>
+					{Auth.loggedIn() ? (
+						<StyledLink to='/' onClick={() => Auth.logout()} className='navbar-link'>
+							Log Out
 						</StyledLink>
-						<StyledLink to={'/about'} className='navbar-link'>
-							About Us
-						</StyledLink>
-						<StyledLink to={'/contact'} className='navbar-link'>
-							Contact
-						</StyledLink>
-						{Auth.loggedIn() ? (
-							<StyledLink to='/' onClick={() => Auth.logout()} className='navbar-link'>
-								Log Out
-							</StyledLink>
-						) : (
-							<></>
-						)}
-					</LinkContainer>
-				)}
-			</Nav>
+					) : (
+						<></>
+					)}
+				</LinkContainer>
+			)}
 			<div ref={dropdownMenu} id='navbar-dropdown' className=' hidden .flex .items-center .flex-col .m-auto .w-full .border .rounded-bl-lg .rounded-br-lg .bg-blue-500 .text-white .absolute .z-50'>
 				<StyledLink to={'/'} className='navbar-link'>
 					Home
@@ -121,7 +118,7 @@ function Navbar() {
 					<></>
 				)}
 			</div>
-		</>
+		</Nav>
 	);
 }
 

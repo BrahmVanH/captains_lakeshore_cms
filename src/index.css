@@ -16,13 +16,16 @@ body {
 }
 body {
 	background-color: rgba(116, 159, 177, 0.381) !important;
+	color: #81580e;
 }
 
 #root {
 	display: flex;
 	flex-direction: column;
 	min-height: 100vh;
+	max-width: 1280px;
 }
+
 
 .hidden {
 	display: none;

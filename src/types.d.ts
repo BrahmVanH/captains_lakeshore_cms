@@ -13,3 +13,11 @@ export interface GalImg extends ImageObject {
 export interface IProperty extends Property {
 	headerImgKey?: string;
 }
+
+export interface SideBarSCProps {
+	$isOpen: boolean;
+}
+
+export interface MenuItemsSCProps {
+	$isOpen: boolean;
+}
