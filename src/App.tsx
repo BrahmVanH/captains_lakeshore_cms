@@ -9,10 +9,44 @@ import EditPhotos from './pages/EditPhotos';
 
 
 
+const cache = new InMemoryCache({
+	typePolicies: {
+		Query: {
+			fields: {
+				getPropertyInfo: {
+					keyArgs: false,
+					merge(existing = [], incoming) {
+						return [...existing, ...incoming];
+					},
+				},
+				getHideawayImgs: {
+					keyArgs: false,
+					merge(existing = [], incoming) {
+						return [...existing, ...incoming];
+					},
+				},
+				getCottageImgs: {
+					keyArgs: false,
+					merge(existing = [], incoming) {
+						return [...existing, ...incoming];
+					},
+				},
+				getHomeImgs: {
+					keyArgs: false,
+					merge(existing = [], incoming) {
+						return [...existing, ...incoming];
+					},
+				},
+			},
+		},
+	},
+});
+
 const client = new ApolloClient({
-	cache: new InMemoryCache(),
+	cache: cache,
 	link: new HttpLink({
-		uri: import.meta.env.PROD ? import.meta.env.VITE_LAMBDA_FUNCTION_URI : import.meta.env.VITE_LOCALHOST,
+		// uri: import.meta.env.PROD ? import.meta.env.VITE_LAMBDA_FUNCTION_URI : import.meta.env.VITE_LOCALHOST,
+		uri: import.meta.env.VITE_LAMBDA_FUNCTION_URI,
 	}),
 });
 

@@ -21,3 +21,10 @@ export interface SideBarSCProps {
 export interface MenuItemsSCProps {
 	$isOpen: boolean;
 }
+
+export interface InnerWrapProps {
+	$isOpen: boolean;
+	
+}
+
+

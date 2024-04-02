@@ -9,7 +9,7 @@ import ImageGallery from './ImageGallery';
 
 import { GalImg, IProperty } from '../types';
 import styled from 'styled-components';
-import ImgGalOverlay from './ImgGalOverlay';
+import ImgUploadOverlay from './ImgUploadOverlay';
 import { Link } from 'react-router-dom';
 
 const StyledCard = styled.div`
@@ -135,7 +135,7 @@ export default function Card({ propertyName, propertyDescription, amenities }: R
 	}, [error]);
 	return (
 		<StyledCard id='card'>
-			{galleryArray && !loading ? <ImgGalOverlay galleryArray={galleryArray} isShown={showOverlay} /> : <></>}
+			{/* {galleryArray && !loading ? <ImgUploadOverlay galleryArray={galleryArray} isShown={showOverlay} /> : <></>} */}
 			{propertyName && propertyDescription && amenities ? (
 				<CardContainer>
 					<TitleContainer>
@@ -152,7 +152,7 @@ export default function Card({ propertyName, propertyDescription, amenities }: R
 					</TitleContainer>
 					{galleryArray && !loading ? (
 						<ImgGalContainer>
-							<ImageGallery galleryViewportStyle={galleryViewportStyles} rowHeight={100} displayBtns={false} galleryArray={galleryArray} />
+							<ImageGallery enableImageSelection={false} galleryViewportStyle={galleryViewportStyles} rowHeight={100} displayBtns={false} galleryArray={galleryArray} />
 						</ImgGalContainer>
 					) : (
 						<h2>Loading Images</h2>

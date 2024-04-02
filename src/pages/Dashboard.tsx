@@ -42,7 +42,7 @@ export default function Dashboard() {
 			{Auth.loggedIn() ? (
 				<>
 					{propertyInfo ? (
-						<div style={{display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center', marginTop: '2rem'}}>
+						<div style={{ display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center', marginTop: '2rem' }}>
 							{propertyInfo.map((property) => (
 								<Card propertyName={property.propertyName} propertyDescription={property.propertyDescription} amenities={property.amenities} />
 							))}
@@ -53,8 +53,7 @@ export default function Dashboard() {
 				</>
 			) : (
 				<LoginCardContainer>
-
-				<Login />
+					<Login />
 				</LoginCardContainer>
 			)}
 		</>

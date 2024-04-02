@@ -5,15 +5,16 @@ import { useCallback, useEffect, useState } from 'react';
 import { useLazyQuery } from '@apollo/client';
 import { GET_COTTAGE_IMGS, GET_HIDEAWAY_IMGS } from '../lib/queries';
 import { GalImg } from '../types';
+import ImgUploadOverlay from '../components/ImgUploadOverlay';
 
 export default function EditPhotos() {
-
 	// const { propertyName } = useParams<{ propertyName: string }>();
 	const location = useLocation();
 	const { propertyName } = location.state as { propertyName: string };
 
 	const [galleryArray, setGalleryArray] = useState<any>([]);
 	const [error, setError] = useState<any>(null);
+	const [isShown, setIsShown] = useState<boolean>(false);
 
 	const [getHideawayImages] = useLazyQuery(GET_HIDEAWAY_IMGS);
 	const [getCottageImages] = useLazyQuery(GET_COTTAGE_IMGS);
@@ -24,6 +25,14 @@ export default function EditPhotos() {
 		overflowY: 'scroll',
 		maxHeight: '80vh',
 	};
+
+	const handleUploadOverlay = useCallback((show: boolean) => {
+		if (show) {
+			setIsShown(true);
+		} else {
+			setIsShown(false);
+		}
+	}, []);
 
 	const handleFetchImgs = useCallback(
 		async (propertyName: string) => {
@@ -68,12 +77,15 @@ export default function EditPhotos() {
 			handleFetchImgs(propertyName);
 		}
 	}, [propertyName, handleFetchImgs]);
+
+	// prop to hold images that are selected
 	return (
 		<div>
-			<SideMenu />
+			<SideMenu handleUploadOverlay={handleUploadOverlay} propertyName={propertyName} />
 			<div>
-				<ImageGallery galleryViewportStyle={galleryViewportStyle} rowHeight={300} displayBtns={true} galleryArray={galleryArray} />
+				<ImageGallery enableImageSelection={true} galleryViewportStyle={galleryViewportStyle} rowHeight={300} displayBtns={true} galleryArray={galleryArray} />
 			</div>
+			<ImgUploadOverlay handleUploadOverlay={handleUploadOverlay} isShown={isShown} propertyName={propertyName} />
 		</div>
 	);
 }

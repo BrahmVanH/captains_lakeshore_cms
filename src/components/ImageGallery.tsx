@@ -13,11 +13,13 @@ export default function ImageGallery({
 	galleryArray,
 	rowHeight,
 	galleryViewportStyle,
+	enableImageSelection,
 }: {
 	displayBtns: boolean;
 	galleryArray: GalImg[];
 	rowHeight: number;
 	galleryViewportStyle: React.CSSProperties;
+	enableImageSelection: boolean;
 }) {
 	const [formattedGalArr, setFormattedGalArr] = useState<Image[] | null>(null);
 	const [selectedImages, setSelectedImages] = useState<Image[]>([]);
@@ -127,7 +129,7 @@ export default function ImageGallery({
 			{formattedGalArr ? (
 				<>
 					<div style={galleryViewportStyle}>
-						<Gallery images={formattedGalArr} onSelect={handleSelect} rowHeight={rowHeight} defaultContainerWidth={50} />
+						<Gallery images={formattedGalArr} enableImageSelection={enableImageSelection} onSelect={handleSelect} rowHeight={rowHeight} defaultContainerWidth={50} />
 					</div>
 					{/* <div style={{ display: 'flex', flexDirection: 'row', justifyContent: 'center', alignItems: 'center', padding: '1rem' }}>
 						<Button ref={btnsRef} onClick={handleSelectAll} className='hidden'>

@@ -4,10 +4,9 @@ import { LOGIN_USER } from '../lib/mutations';
 import { useForm, FieldValues } from 'react-hook-form';
 import * as Auth from '../lib/auth';
 import styled from 'styled-components';
-import { Button } from 'evergreen-ui';
+import { Button, Icon, TickCircleIcon } from 'evergreen-ui';
 
 import { LoginUserInput } from '../lib/__generated__/graphql';
-
 
 const LoginCard = styled.div`
 	height: min-content;
@@ -96,6 +95,7 @@ export default function Login() {
 	} = useForm();
 
 	const [input, setInput] = useState<FieldValues | null>(null);
+	const [formSubmitted, setFormSubmitted] = useState<boolean>(false);
 
 	const form = useRef<HTMLFormElement>(null);
 	const [loginUser] = useMutation(LOGIN_USER);
@@ -105,8 +105,13 @@ export default function Login() {
 		form.current?.reset();
 	};
 
+	const handleSetSubmitted = () => {
+		setFormSubmitted(true);
+	};
+
 	const handleLogin = useCallback(
 		async (loginFormData: FieldValues) => {
+			handleSetSubmitted();
 			try {
 				const { data } = await loginUser({
 					variables: {
@@ -147,21 +152,27 @@ export default function Login() {
 			<HeaderContainer>
 				<h2 style={{ textAlign: 'center', paddingTop: '1rem' }}>Login</h2>
 			</HeaderContainer>
-			<Form ref={form} onSubmit={handleSubmit((data) => setInput(data))}>
-				<Input autoComplete='username' type='text' minLength={5} maxLength={25} placeholder='username' {...register('username', { required: true })} />
-				<Input autoComplete='current-password' type='password' minLength={5} maxLength={25} placeholder='password' {...register('userPassword', { required: true })} />
+			{formSubmitted ? (
+				<div style={{ margin: '2rem' }}>
+					<Icon icon={TickCircleIcon} color='success' size={24} />
+				</div>
+			) : (
+				<Form ref={form} onSubmit={handleSubmit((data) => setInput(data))}>
+					<Input autoComplete='username' type='text' minLength={5} maxLength={25} placeholder='username' {...register('username', { required: true })} />
+					<Input autoComplete='current-password' type='password' minLength={5} maxLength={25} placeholder='password' {...register('userPassword', { required: true })} />
 
-				{(errors.username && errors.username.type === 'required') || (errors.password && errors.password.type === 'required') ? (
-					<AlertRect>
-						<AlertMessage style={{ fontSize: '10px' }} role='alert'>
-							You must fill all fields.
-						</AlertMessage>
-					</AlertRect>
-				) : (
-					<></>
-				)}
-				<ButtonS type='submit'>Login</ButtonS>
-			</Form>
+					{(errors.username && errors.username.type === 'required') || (errors.password && errors.password.type === 'required') ? (
+						<AlertRect>
+							<AlertMessage style={{ fontSize: '10px' }} role='alert'>
+								You must fill all fields.
+							</AlertMessage>
+						</AlertRect>
+					) : (
+						<></>
+					)}
+					<ButtonS type='submit'>Login</ButtonS>
+				</Form>
+			)}
 		</LoginCard>
 	);
 }
