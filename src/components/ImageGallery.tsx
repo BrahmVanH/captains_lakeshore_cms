@@ -3,10 +3,9 @@ import { Gallery, Image } from 'react-grid-gallery';
 // import { useMutation } from '@apollo/client';
 // import { DELETE_IMAGES } from '../lib/mutations';
 import { GalImg } from '../types';
-import { useLazyQuery } from '@apollo/client';
-import { GET_PRESEIGNED_URL } from '../lib/queries';
-import { deleteImgFromS3 } from '../lib/s3';
-import { Button, EditIcon } from 'evergreen-ui';
+// import { useLazyQuery } from '@apollo/client';
+// import { GET_PRESEIGNED_URL } from '../lib/queries';
+// import { deleteImgFromS3 } from '../lib/s3';
 
 export default function ImageGallery({
 	displayBtns,
@@ -23,10 +22,10 @@ export default function ImageGallery({
 }) {
 	const [formattedGalArr, setFormattedGalArr] = useState<Image[] | null>(null);
 	const [selectedImages, setSelectedImages] = useState<Image[]>([]);
-	const hasSelected = galleryArray.some((img) => img.isSelected);
+	// const hasSelected = galleryArray.some((img) => img.isSelected);
 	const btnsRef = useRef<HTMLButtonElement>(null);
 
-	const [deleteImages] = useLazyQuery(GET_PRESEIGNED_URL);
+	// const [deleteImages] = useLazyQuery(GET_PRESEIGNED_URL);
 
 	const handleImageFormat = useCallback(() => {
 		const formattedImages: Image[] = galleryArray.map((img) => {
@@ -71,46 +70,46 @@ export default function ImageGallery({
 		[formattedGalArr]
 	);
 
-	const handleSelectAll = useCallback(() => {
-		if (!formattedGalArr) return;
-		const nextImages = formattedGalArr.map((img) => {
-			return { ...img, isSelected: !hasSelected };
-		});
-		const selectedImages = nextImages.filter((img) => img.isSelected);
-		setFormattedGalArr(nextImages);
-		setSelectedImages(selectedImages);
-	}, [formattedGalArr, hasSelected]);
+	// const handleSelectAll = useCallback(() => {
+	// 	if (!formattedGalArr) return;
+	// 	const nextImages = formattedGalArr.map((img) => {
+	// 		return { ...img, isSelected: !hasSelected };
+	// 	});
+	// 	const selectedImages = nextImages.filter((img) => img.isSelected);
+	// 	setFormattedGalArr(nextImages);
+	// 	setSelectedImages(selectedImages);
+	// }, [formattedGalArr, hasSelected]);
 
-	const handleDeleteSelected = useCallback(async () => {
-		try {
-			if (selectedImages.length < 1) return;
-			if (!selectedImages[0].key) return;
-			console.log('selectedImages:', selectedImages);
-			console.log('deleting selected image from s3 bucket');
-			const { data, error } = await deleteImages({
-				variables: {
-					imgKey: `${selectedImages[0].key}` ?? '',
-					commandType: 'delete',
-					altTag: selectedImages[0].alt ?? '',
-				},
-			});
+	// const handleDeleteSelected = useCallback(async () => {
+	// 	try {
+	// 		if (selectedImages.length < 1) return;
+	// 		if (!selectedImages[0].key) return;
+	// 		console.log('selectedImages:', selectedImages);
+	// 		console.log('deleting selected image from s3 bucket');
+	// 		const { data, error } = await deleteImages({
+	// 			variables: {
+	// 				imgKey: `${selectedImages[0].key}` ?? '',
+	// 				commandType: 'delete',
+	// 				altTag: selectedImages[0].alt ?? '',
+	// 			},
+	// 		});
 
-			if (error || !data) {
-				throw new Error('Error fetching presigned URL' + error?.message);
-			}
+	// 		if (error || !data) {
+	// 			throw new Error('Error fetching presigned URL' + error?.message);
+	// 		}
 
-			const imageDeleted = await deleteImgFromS3(`${selectedImages[0].key}`, data.getPresignedS3Url);
+	// 		const imageDeleted = await deleteImgFromS3(`${selectedImages[0].key}`, data.getPresignedS3Url);
 
-			if (!imageDeleted) {
-				throw new Error('Error deleting image');
-			}
+	// 		if (!imageDeleted) {
+	// 			throw new Error('Error deleting image');
+	// 		}
 
-			console.log('Image deleted successfully', data);
-		} catch (error) {
-			console.error(error);
-			throw new Error('Error deleting image');
-		}
-	}, [selectedImages]);
+	// 		console.log('Image deleted successfully', data);
+	// 	} catch (error) {
+	// 		console.error(error);
+	// 		throw new Error('Error deleting image');
+	// 	}
+	// }, [selectedImages]);
 
 	useEffect(() => {
 		console.log('formattedGalArr:', formattedGalArr);
@@ -125,7 +124,7 @@ export default function ImageGallery({
 	}, [selectedImages]);
 
 	return (
-		<div id='imageGallery' style={{maxHeight: '100vh'}}>
+		<div id='imageGallery' style={{ maxHeight: '100vh' }}>
 			{formattedGalArr ? (
 				<>
 					<div style={galleryViewportStyle}>

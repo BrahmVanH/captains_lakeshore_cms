@@ -1,10 +1,9 @@
 // Sidebar.js
 
 import { useEffect, useRef, useState } from 'react';
-import styled, { useTheme } from 'styled-components';
-import { Button, CircleArrowRightIcon, CircleArrowLeftIcon, Icon, PinIcon, UnpinIcon, DeleteIcon, UploadIcon, MultiSelectIcon, Tooltip, MenuIcon } from 'evergreen-ui';
-import { SideBarSCProps, MenuItemsSCProps, InnerWrapProps } from '../types';
-import ImgUploadOverlay from './ImgUploadOverlay';
+import styled from 'styled-components';
+import { Button, Icon, PinIcon, UnpinIcon, DeleteIcon, UploadIcon, MultiSelectIcon, Tooltip, MenuIcon } from 'evergreen-ui';
+import { SideBarSCProps, MenuItemsSCProps } from '../types';
 
 // Styled component that accepts global theme object and isOpen boolean prop to conditionally transition/pin the sidebar
 const SidebarContainer = styled.div<SideBarSCProps>(({ theme, $isOpen }) => ({
@@ -48,28 +47,27 @@ const SidebarContainer = styled.div<SideBarSCProps>(({ theme, $isOpen }) => ({
 // }));
 
 // Styled evergreen button
-const ArrowButton = styled(Button)`
-	display: flex;
-	padding: 0rem;
-	margin: 0rem;
-	background-color: transparent;
+// const ArrowButton = styled(Button)`
+// 	display: flex;
+// 	padding: 0rem;
+// 	margin: 0rem;
+// 	background-color: transparent;
 
-	/* &.hover,
-	&:hover,
-	&.active,
-	&:active &:focus,
-	&.focus,
-	&:visited,
-	&.visited {
-		background-color: transparent;
-		border: none;
-		box-shadow: none;
-	} */
-`;
+// 	/* &.hover,
+// 	&:hover,
+// 	&.active,
+// 	&:active &:focus,
+// 	&.focus,
+// 	&:visited,
+// 	&.visited {
+// 		background-color: transparent;
+// 		border: none;
+// 		box-shadow: none;
+// 	} */
+// `;
 
 // Styled evergreen button
-const ControlBtn = styled(Button)(
-	({ $isOpen }) => `
+const ControlBtn = styled(Button)`
 	position: absolute;
 	top: 0px;
 	right: -3px;
@@ -88,9 +86,8 @@ const ControlBtn = styled(Button)(
 		border: none;
 		box-shadow: none;
 	}
+`;
 
-	`
-);
 // Styled component that accepts isOpen boolean prop to conditionally display the menu items
 const MenuItems = styled.div<MenuItemsSCProps>(
 	({ $isOpen }) => `
@@ -110,7 +107,7 @@ const MenuItems = styled.div<MenuItemsSCProps>(
 );
 
 // Styled evergreen button
-const MenuOptionBtn = styled(Button)(({ theme }) => ({
+const MenuOptionBtn = styled(Button)(({}) => ({
 	width: '80%',
 	color: 'white',
 	border: '1px solid white',
@@ -129,17 +126,17 @@ export default function SideMenu({ propertyName, handleUploadOverlay }: { proper
 	const [isOpen, setIsOpen] = useState<boolean>(false);
 	const [isPinned, setIsPinned] = useState<boolean>(false);
 	const menuRef = useRef<HTMLDivElement>(null);
-	const theme = useTheme();
 
 	const handlePinSidebar = (event: any) => {
 		event.preventDefault();
 		setIsPinned(!isPinned);
 	};
 
-	const handlePinMenu = (event: any) => {
-		event.preventDefault();
-		setIsPinned(!isPinned);
-	};
+	useEffect(() => {
+		if (propertyName) {
+			console.log('propertyName', propertyName);
+		}
+	}, [propertyName]);
 
 	const handleOpenMenu = () => {
 		setIsOpen(true);

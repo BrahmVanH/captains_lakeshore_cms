@@ -55,7 +55,7 @@ export default function UploadImage({ propertyName }: Readonly<{ propertyName: s
 	const {
 		register,
 		handleSubmit,
-		formState: { errors },
+		// formState: { errors },
 	} = useForm();
 	const { ref: imgRef, ...restImg } = register('image', { required: true });
 	const { ref: altRef, ...restAlt } = register('altTag', { required: true });

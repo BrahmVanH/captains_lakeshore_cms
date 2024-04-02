@@ -3,13 +3,12 @@ import { useEffect, useCallback, useState } from 'react';
 import { useLazyQuery } from '@apollo/client';
 import { GET_HIDEAWAY_IMGS, GET_COTTAGE_IMGS } from '../lib/queries';
 
-import { Button, EditIcon, Overlay } from 'evergreen-ui';
+import { Button, EditIcon } from 'evergreen-ui';
 
 import ImageGallery from './ImageGallery';
 
 import { GalImg, IProperty } from '../types';
 import styled from 'styled-components';
-import ImgUploadOverlay from './ImgUploadOverlay';
 import { Link } from 'react-router-dom';
 
 const StyledCard = styled.div`
@@ -58,8 +57,6 @@ export default function Card({ propertyName, propertyDescription, amenities }: R
 	const [galleryArray, setGalleryArray] = useState<GalImg[] | null>([]);
 	const [loading, setLoading] = useState<boolean>(false);
 	const [error, setError] = useState<any>(null);
-	const [data, setData] = useState<any>(null);
-	const [showOverlay, setShowOverlay] = useState<boolean>(false);
 	const [getCottageImages] = useLazyQuery(GET_COTTAGE_IMGS);
 	const [getHideawayImages] = useLazyQuery(GET_HIDEAWAY_IMGS);
 
@@ -86,9 +83,7 @@ export default function Card({ propertyName, propertyDescription, amenities }: R
 		console.log('amenities:', amenities);
 	}, [amenities]);
 
-	const handleShowOverlay = useCallback(() => {
-		setShowOverlay(!showOverlay);
-	}, [showOverlay]);
+
 
 	const handleFetchImgs = useCallback(
 		async (propertyName: string) => {
@@ -96,6 +91,9 @@ export default function Card({ propertyName, propertyDescription, amenities }: R
 			try {
 				if (propertyName === "Captain's Hideaway") {
 					const { loading, error, data } = await getHideawayImages();
+					if (loading && !data) {
+						setLoading(loading);
+					}
 					if (!loading && data) {
 						setGalleryArray(data.getHideawayImgs.galleryArray as GalImg[]);
 					}

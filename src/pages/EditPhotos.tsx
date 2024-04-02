@@ -1,4 +1,4 @@
-import { useParams, useLocation } from 'react-router-dom';
+import { useLocation } from 'react-router-dom';
 import ImageGallery from '../components/ImageGallery';
 import SideMenu from '../components/SideMenu';
 import { useCallback, useEffect, useState } from 'react';
@@ -25,6 +25,12 @@ export default function EditPhotos() {
 		overflowY: 'scroll',
 		maxHeight: '80vh',
 	};
+
+	useEffect(() => {
+		if (error) {
+			console.error(error);
+		}
+	}, [error]);
 
 	const handleUploadOverlay = useCallback((show: boolean) => {
 		if (show) {

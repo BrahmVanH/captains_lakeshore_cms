@@ -1,8 +1,4 @@
 import { BoxProps, Overlay } from 'evergreen-ui';
-import { useState } from 'react';
-import styled from 'styled-components';
-import ImageGallery from './ImageGallery';
-import { GalImg } from '../types';
 import UploadImage from './UploadImage';
 
 export default function ImgUploadOverlay({ isShown, propertyName, handleUploadOverlay }: { isShown: boolean; propertyName: string; handleUploadOverlay: (show: boolean) => void }) {
