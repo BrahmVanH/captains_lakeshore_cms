@@ -15,6 +15,8 @@ export default function EditPhotos() {
 	const [galleryArray, setGalleryArray] = useState<any>([]);
 	const [error, setError] = useState<any>(null);
 	const [isShown, setIsShown] = useState<boolean>(false);
+	const [selectAllImages, setSelectAllImages] = useState<boolean>(false);
+	const [deleteSelectedImages, setDeleteSelectedImages] = useState<boolean>(false);
 
 	const [getHideawayImages] = useLazyQuery(GET_HIDEAWAY_IMGS);
 	const [getCottageImages] = useLazyQuery(GET_COTTAGE_IMGS);
@@ -38,6 +40,14 @@ export default function EditPhotos() {
 		} else {
 			setIsShown(false);
 		}
+	}, []);
+
+	const handleSetSelectAll = useCallback(() => {
+		setSelectAllImages(!selectAllImages);
+	}, [selectAllImages]);
+
+	const handleDeleteSelected = useCallback(() => {
+		setDeleteSelectedImages(true);
 	}, []);
 
 	const handleFetchImgs = useCallback(
@@ -87,9 +97,9 @@ export default function EditPhotos() {
 	// prop to hold images that are selected
 	return (
 		<div>
-			<SideMenu handleUploadOverlay={handleUploadOverlay} propertyName={propertyName} />
+			<SideMenu handleDeleteSelected={handleDeleteSelected} handleSetSelectAll={handleSetSelectAll} handleUploadOverlay={handleUploadOverlay} propertyName={propertyName} />
 			<div>
-				<ImageGallery enableImageSelection={true} galleryViewportStyle={galleryViewportStyle} rowHeight={300} displayBtns={true} galleryArray={galleryArray} />
+				<ImageGallery deleteSelectedImages={deleteSelectedImages} selectAllImages={selectAllImages} enableImageSelection={true} galleryViewportStyle={galleryViewportStyle} rowHeight={300} galleryArray={galleryArray} />
 			</div>
 			<ImgUploadOverlay handleUploadOverlay={handleUploadOverlay} isShown={isShown} propertyName={propertyName} />
 		</div>

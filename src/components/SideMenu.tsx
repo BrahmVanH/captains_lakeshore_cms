@@ -122,7 +122,17 @@ const ToolTipTxt = styled.p`
 	line-height: 0;
 `;
 
-export default function SideMenu({ propertyName, handleUploadOverlay }: { propertyName: string; handleUploadOverlay: (show: boolean) => void }) {
+export default function SideMenu({
+	propertyName,
+	handleUploadOverlay,
+	handleSetSelectAll,
+	handleDeleteSelected,
+}: Readonly<{
+	propertyName: string;
+	handleUploadOverlay: (show: boolean) => void;
+	handleSetSelectAll: () => void;
+	handleDeleteSelected: () => void;
+}>) {
 	const [isOpen, setIsOpen] = useState<boolean>(false);
 	const [isPinned, setIsPinned] = useState<boolean>(false);
 	const menuRef = useRef<HTMLDivElement>(null);
@@ -168,10 +178,10 @@ export default function SideMenu({ propertyName, handleUploadOverlay }: { proper
 				<MenuOptionBtn onClick={() => handleUploadOverlay(true)} iconAfter={UploadIcon} appearance='minimal'>
 					Upload
 				</MenuOptionBtn>
-				<MenuOptionBtn iconAfter={DeleteIcon} appearance='minimal'>
+				<MenuOptionBtn onClick={handleDeleteSelected} iconAfter={DeleteIcon} appearance='minimal'>
 					Delete
 				</MenuOptionBtn>
-				<MenuOptionBtn iconAfter={MultiSelectIcon} appearance='minimal'>
+				<MenuOptionBtn onClick={handleSetSelectAll} iconAfter={MultiSelectIcon} appearance='minimal'>
 					Select All
 				</MenuOptionBtn>
 			</MenuItems>

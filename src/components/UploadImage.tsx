@@ -51,11 +51,15 @@ const SButton = styled(Button)`
 	}
 `;
 
+const HiddenInput = styled.input`
+	display: none;
+`;
+
 export default function UploadImage({ propertyName }: Readonly<{ propertyName: string }>) {
 	const {
 		register,
 		handleSubmit,
-		// formState: { errors },
+		formState: { errors },
 	} = useForm();
 	const { ref: imgRef, ...restImg } = register('image', { required: true });
 	const { ref: altRef, ...restAlt } = register('altTag', { required: true });
@@ -65,31 +69,50 @@ export default function UploadImage({ propertyName }: Readonly<{ propertyName: s
 	const [fileName, setFileName] = useState<string>('');
 	const [isFileSet, setIsFileSet] = useState<boolean>(false);
 
-	const altInputRef = useRef<HTMLInputElement>(null);
+	// const altInputRef = useRef<HTMLInputElement>(null);
 
 	const [getPresignedUrl] = useLazyQuery(GET_PRESEIGNED_URL);
 
 	const hiddenInputRef = useRef<HTMLInputElement>(null);
 	const uploadBtn = useRef<HTMLButtonElement>(null);
-	const HiddenInput = styled.input`
-		display: none;
-	`;
+
+	// const triggerHiddenInput = useCallback(() => {
+	// 	if (hiddenInputRef.current) {
+	// 		hiddenInputRef.current.click();
+	// 	}
+	// }, [hiddenInputRef]);
 
 	const triggerHiddenInput = useCallback(() => {
-		if (hiddenInputRef.current) {
-			hiddenInputRef.current.click();
-		}
-	}, [hiddenInputRef]);
+		// imgRef(hiddenInputRef.current);
+		hiddenInputRef.current?.click();
+	}, []);
+
+	// const setHiddenInputRef = useCallback(
+	// 	(e: any) => {
+	// 		if (!imgRef) return;
+	// 		console.log('e: ', e);
+	// 		// hiddenInputRef.current = e;
+	// 		imgRef(e);
+	// 		console.log('e:', e);
+
+	// 	},
+	// 	[imgRef]
+	// );
 
 	const handleSetFileName = useCallback(() => {
-		if (hiddenInputRef.current && hiddenInputRef.current.files?.[0]) {
-			setFileName(hiddenInputRef.current.files?.[0].name);
-			setIsFileSet(true);
-		}
+		// if (hiddenInputRef?.current?.files?.[0]) {
+		// 	setFileName(hiddenInputRef.current.files?.[0].name);
+		// 	setIsFileSet(true);
+		// }
 	}, [hiddenInputRef]);
+
+	// const handleEnableBtn = useCallback(() => {
+	// 	uploadBtn.current?.removeAttribute('disabled');
+	// }, [uploadBtn]);
 
 	const handleImageUpload = useCallback(
 		async ({ image, altTag }: FieldValues) => {
+			console.log('uploading image:', image[0].name, altTag, keyPrefix);
 			try {
 				const { data, error } = await getPresignedUrl({
 					variables: {
@@ -131,27 +154,19 @@ export default function UploadImage({ propertyName }: Readonly<{ propertyName: s
 		}
 	}, [propertyName]);
 
-	useEffect(() => {
-		if (fileName !== '') {
-		}
-	}, [fileName]);
-
-	useEffect(() => {
-		if (!!fileName) {
-			console.log('filename:', fileName);
-		}
-	}, [fileName]);
-
 	return (
 		<UploadFormWrapper>
 			<h1 style={{ color: 'white' }}>Upload Image</h1>
 			<Form onSubmit={handleSubmit((data) => setInput(data))}>
 				<HiddenInput {...restImg} onChange={handleSetFileName} ref={hiddenInputRef} type='file' />
+				{errors.image && <span style={{ color: 'red' }}>This field is required</span>}
 				<SButton onClick={triggerHiddenInput} iconBefore={ImportIcon} type='button' appearance='minimal'>
 					Choose File
 				</SButton>
-				<Input $isFileSet={isFileSet} {...restAlt} ref={altInputRef} type='text' placeholder='alt tag' />
-				<SButton ref={uploadBtn} disabled iconBefore={CloudUploadIcon} type='submit'>
+				{fileName && <span style={{ color: 'white' }}>{fileName}</span>}
+				<Input $isFileSet={isFileSet} {...restAlt} type='text' placeholder='alt tag' />
+				{errors.altTag && <span style={{ color: 'red' }}>This field is required</span>}
+				<SButton type='submit' iconBefore={CloudUploadIcon}>
 					Upload
 				</SButton>
 			</Form>

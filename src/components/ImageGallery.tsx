@@ -1,31 +1,34 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { Gallery, Image } from 'react-grid-gallery';
 // import { useMutation } from '@apollo/client';
-// import { DELETE_IMAGES } from '../lib/mutations';
 import { GalImg } from '../types';
-// import { useLazyQuery } from '@apollo/client';
-// import { GET_PRESEIGNED_URL } from '../lib/queries';
-// import { deleteImgFromS3 } from '../lib/s3';
+import { useLazyQuery } from '@apollo/client';
+import { GET_PRESEIGNED_URL } from '../lib/queries';
+import { deleteImgFromS3 } from '../lib/s3';
+// import { Button } from 'evergreen-ui';
 
 export default function ImageGallery({
-	displayBtns,
 	galleryArray,
 	rowHeight,
 	galleryViewportStyle,
 	enableImageSelection,
-}: {
-	displayBtns: boolean;
+	selectAllImages,
+	deleteSelectedImages,
+}: Readonly<{
 	galleryArray: GalImg[];
 	rowHeight: number;
 	galleryViewportStyle: React.CSSProperties;
 	enableImageSelection: boolean;
-}) {
+	selectAllImages: boolean;
+	deleteSelectedImages: boolean;
+}>) {
 	const [formattedGalArr, setFormattedGalArr] = useState<Image[] | null>(null);
 	const [selectedImages, setSelectedImages] = useState<Image[]>([]);
-	// const hasSelected = galleryArray.some((img) => img.isSelected);
 	const btnsRef = useRef<HTMLButtonElement>(null);
 
-	// const [deleteImages] = useLazyQuery(GET_PRESEIGNED_URL);
+	const hasSelected = galleryArray.some((img) => img.isSelected);
+
+	const [deleteImages] = useLazyQuery(GET_PRESEIGNED_URL);
 
 	const handleImageFormat = useCallback(() => {
 		const formattedImages: Image[] = galleryArray.map((img) => {
@@ -41,14 +44,6 @@ export default function ImageGallery({
 
 		setFormattedGalArr(formattedImages);
 	}, [galleryArray]);
-
-	useEffect(() => {
-		if (displayBtns) {
-			btnsRef.current?.classList.remove('hidden');
-		} else {
-			btnsRef.current?.classList.add('hidden');
-		}
-	}, [displayBtns]);
 
 	const handleSelect = useCallback(
 		(index: number) => {
@@ -70,74 +65,88 @@ export default function ImageGallery({
 		[formattedGalArr]
 	);
 
-	// const handleSelectAll = useCallback(() => {
-	// 	if (!formattedGalArr) return;
-	// 	const nextImages = formattedGalArr.map((img) => {
-	// 		return { ...img, isSelected: !hasSelected };
-	// 	});
-	// 	const selectedImages = nextImages.filter((img) => img.isSelected);
-	// 	setFormattedGalArr(nextImages);
-	// 	setSelectedImages(selectedImages);
-	// }, [formattedGalArr, hasSelected]);
+	const handleSelectAll = useCallback(() => {
+		if (!formattedGalArr) return;
+		const nextImages = formattedGalArr.map((img) => {
+			return { ...img, isSelected: !hasSelected };
+		});
+		const selectedImages = nextImages.filter((img) => img.isSelected);
+		setFormattedGalArr(nextImages);
+		setSelectedImages(selectedImages);
+	}, [formattedGalArr, hasSelected]);
 
-	// const handleDeleteSelected = useCallback(async () => {
-	// 	try {
-	// 		if (selectedImages.length < 1) return;
-	// 		if (!selectedImages[0].key) return;
-	// 		console.log('selectedImages:', selectedImages);
-	// 		console.log('deleting selected image from s3 bucket');
-	// 		const { data, error } = await deleteImages({
-	// 			variables: {
-	// 				imgKey: `${selectedImages[0].key}` ?? '',
-	// 				commandType: 'delete',
-	// 				altTag: selectedImages[0].alt ?? '',
-	// 			},
-	// 		});
+	const handleDeselectAll = useCallback(() => {
+		if (!formattedGalArr) return;
+		const nextImages = formattedGalArr.map((img) => {
+			return { ...img, isSelected: false };
+		});
+		setFormattedGalArr(nextImages);
+		setSelectedImages([]);
+	}, [formattedGalArr]);
 
-	// 		if (error || !data) {
-	// 			throw new Error('Error fetching presigned URL' + error?.message);
-	// 		}
+	const handleDeleteSelected = useCallback(async () => {
+		try {
+			if (selectedImages.length < 1) return;
+			if (!selectedImages[0].key) return;
+			console.log('selectedImages:', selectedImages);
+			console.log('deleting selected image from s3 bucket');
+			const { data, error } = await deleteImages({
+				variables: {
+					imgKey: `${selectedImages[0].key}` ?? '',
+					commandType: 'delete',
+					altTag: selectedImages[0].alt ?? '',
+				},
+			});
 
-	// 		const imageDeleted = await deleteImgFromS3(`${selectedImages[0].key}`, data.getPresignedS3Url);
+			if (error || !data) {
+				throw new Error('Error fetching presigned URL' + error?.message);
+			}
 
-	// 		if (!imageDeleted) {
-	// 			throw new Error('Error deleting image');
-	// 		}
+			const imageDeleted = await deleteImgFromS3(`${selectedImages[0].key}`, data.getPresignedS3Url);
 
-	// 		console.log('Image deleted successfully', data);
-	// 	} catch (error) {
-	// 		console.error(error);
-	// 		throw new Error('Error deleting image');
-	// 	}
-	// }, [selectedImages]);
+			if (!imageDeleted) {
+				throw new Error('Error deleting image');
+			}
+
+			console.log('Image deleted successfully', data);
+		} catch (error) {
+			console.error(error);
+			throw new Error('Error deleting image');
+		}
+	}, [selectedImages]);
 
 	useEffect(() => {
-		console.log('formattedGalArr:', formattedGalArr);
-	}, [formattedGalArr]);
+		if (selectAllImages) {
+			handleSelectAll();
+		} else {
+			handleDeselectAll();
+		}
+	}, [selectAllImages]);
+
+	useEffect(() => {
+		if (deleteSelectedImages) {
+			handleDeleteSelected();
+		}
+	}, [deleteSelectedImages]);
 
 	useEffect(() => {
 		handleImageFormat();
-	}, [galleryArray]);
-
-	useEffect(() => {
-		console.log('selectedImages:', selectedImages);
-	}, [selectedImages]);
+	}, [galleryArray, handleImageFormat]);
 
 	return (
 		<div id='imageGallery' style={{ maxHeight: '100vh' }}>
 			{formattedGalArr ? (
 				<>
 					<div style={galleryViewportStyle}>
+						{/* <Button onClick={handleSelectAll}>Select All</Button>
+						<Button onClick={handleDeselectAll}>Deselect All</Button> */}
 						<Gallery images={formattedGalArr} enableImageSelection={enableImageSelection} onSelect={handleSelect} rowHeight={rowHeight} defaultContainerWidth={50} />
 					</div>
-					{/* <div style={{ display: 'flex', flexDirection: 'row', justifyContent: 'center', alignItems: 'center', padding: '1rem' }}>
-						<Button ref={btnsRef} onClick={handleSelectAll} className='hidden'>
-						Select All
-						</Button>
-						<Button ref={btnsRef} onClick={handleDeleteSelected} className='hidden'>
-						Delete Selected
-						</Button>
-					</div> */}
+					<div style={{ display: 'flex', flexDirection: 'row', justifyContent: 'center', alignItems: 'center', padding: '1rem' }}>
+						{/* <Button ref={btnsRef} onClick={handleDeleteSelected} className='hidden'>
+							Delete Selected
+						</Button> */}
+					</div>
 				</>
 			) : (
 				<></>

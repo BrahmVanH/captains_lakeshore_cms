@@ -6,46 +6,45 @@ import Navbar from './components/Navbar';
 import Dashboard from './pages/Dashboard';
 import EditPhotos from './pages/EditPhotos';
 
+// const cache = new InMemoryCache({
+// 	typePolicies: {
+// 		Query: {
+// 			fields: {
+// 				getPropertyInfo: {
+// 					keyArgs: false,
+// 					merge(incoming, existing = []) {
+// 						return [...existing, ...incoming];
+// 					},
+// 				},
+// 				getHideawayImgs: {
+// 					keyArgs: false,
 
-
-const cache = new InMemoryCache({
-	typePolicies: {
-		Query: {
-			fields: {
-				getPropertyInfo: {
-					keyArgs: false,
-					merge(existing = [], incoming) {
-						return [...existing, ...incoming];
-					},
-				},
-				getHideawayImgs: {
-					keyArgs: false,
-					merge(existing = [], incoming) {
-						return [...existing, ...incoming];
-					},
-				},
-				getCottageImgs: {
-					keyArgs: false,
-					merge(existing = [], incoming) {
-						return [...existing, ...incoming];
-					},
-				},
-				getHomeImgs: {
-					keyArgs: false,
-					merge(existing = [], incoming) {
-						return [...existing, ...incoming];
-					},
-				},
-			},
-		},
-	},
-});
+// 					merge(incoming, existing = []) {
+// 						return [...existing, ...incoming];
+// 					},
+// 				},
+// 				getCottageImgs: {
+// 					keyArgs: false,
+// 					merge(incoming, existing = []) {
+// 						return [...existing, ...incoming];
+// 					},
+// 				},
+// 				getHomeImgs: {
+// 					keyArgs: false,
+// 					merge(incoming, existing = []) {
+// 						return [...existing, ...incoming];
+// 					},
+// 				},
+// 			},
+// 		},
+// 	},
+// });
 
 const client = new ApolloClient({
-	cache: cache,
+	cache: new InMemoryCache(),
 	link: new HttpLink({
-		// uri: import.meta.env.PROD ? import.meta.env.VITE_LAMBDA_FUNCTION_URI : import.meta.env.VITE_LOCALHOST,
-		uri: import.meta.env.VITE_LAMBDA_FUNCTION_URI,
+		uri: import.meta.env.PROD ? import.meta.env.VITE_LAMBDA_FUNCTION_URI : import.meta.env.VITE_LOCALHOST,
+		// uri: import.meta.env.VITE_LAMBDA_FUNCTION_URI,
 	}),
 });
 
