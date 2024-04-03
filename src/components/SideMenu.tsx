@@ -166,7 +166,7 @@ export default function SideMenu({
 
 	return (
 		<SidebarContainer ref={menuRef} $isOpen={isOpen} onMouseEnter={handleOpenMenu} onMouseLeave={handleCloseMenu}>
-			<Tooltip content={<ToolTipTxt style={{ fontSize: '12px', color: 'white', lineHeight: 0 }}>Pin Menu</ToolTipTxt>} position='right'>
+			<Tooltip content={<ToolTipTxt>Pin Menu</ToolTipTxt>} position='right'>
 				<ControlBtn $isOpen={isOpen} appearance='minimal' onClick={handlePinSidebar}>
 					{isOpen ? <>{isPinned ? <Icon icon={UnpinIcon} color='white' size={12} /> : <Icon icon={PinIcon} color='white' size={12} />}</> : <Icon icon={MenuIcon} color='white' size={12} />}
 				</ControlBtn>

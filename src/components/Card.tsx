@@ -3,9 +3,10 @@ import { useEffect, useCallback, useState } from 'react';
 import { useLazyQuery } from '@apollo/client';
 import { GET_HIDEAWAY_IMGS, GET_COTTAGE_IMGS } from '../lib/queries';
 
-import { Button, EditIcon } from 'evergreen-ui';
+import { Button, EditIcon, Tooltip } from 'evergreen-ui';
 
 import ImageGallery from './ImageGallery';
+import EditPropertyOverlay from './EditPropertyOverlay';
 
 import { GalImg, IProperty } from '../types';
 import styled from 'styled-components';
@@ -53,12 +54,13 @@ const StyledBtn = styled(Button)`
 	margin-bottom: 1rem;
 `;
 
-export default function Card({ propertyName, propertyDescription, amenities }: Readonly<IProperty>) {
+export default function Card({ propertyName }: Readonly<{ propertyName: string }>) {
 	const [galleryArray, setGalleryArray] = useState<GalImg[] | null>([]);
 	const [loading, setLoading] = useState<boolean>(false);
 	const [error, setError] = useState<any>(null);
 	const [getCottageImages] = useLazyQuery(GET_COTTAGE_IMGS);
 	const [getHideawayImages] = useLazyQuery(GET_HIDEAWAY_IMGS);
+	const [openEditPropertyOverlay, setOpenEditPropertyOverlay] = useState<boolean>(false);
 
 	const galleryViewportStyles: React.CSSProperties = {
 		maxHeight: 'calc(3 * (100px + 10px))',
@@ -71,19 +73,17 @@ export default function Card({ propertyName, propertyDescription, amenities }: R
 	// 	}
 	// }, [data]);
 
+	const handleOpenEditPropertyOverlay = useCallback((openOverlay: boolean) => {
+		if (openOverlay) {
+			setOpenEditPropertyOverlay(true);
+		} else {
+			setOpenEditPropertyOverlay(false);
+		}
+	}, []);
+
 	useEffect(() => {
 		console.log('property name:', propertyName);
 	}, [propertyName]);
-
-	useEffect(() => {
-		console.log('property description:', propertyDescription);
-	}, [propertyDescription]);
-
-	useEffect(() => {
-		console.log('amenities:', amenities);
-	}, [amenities]);
-
-
 
 	const handleFetchImgs = useCallback(
 		async (propertyName: string) => {
@@ -134,23 +134,28 @@ export default function Card({ propertyName, propertyDescription, amenities }: R
 	return (
 		<StyledCard id='card'>
 			{/* {galleryArray && !loading ? <ImgUploadOverlay galleryArray={galleryArray} isShown={showOverlay} /> : <></>} */}
-			{propertyName && propertyDescription && amenities ? (
+			{propertyName ? (
 				<CardContainer>
 					<TitleContainer>
 						<div>
 							<h1>{propertyName}</h1>
 						</div>
 						<BtnContainer>
-							<StyledBtn iconBefore={EditIcon}>Property Name</StyledBtn>
-							<StyledBtn iconBefore={EditIcon}>Description</StyledBtn>
-							<Link to={`/photos/${propertyName}`} state={{ propertyName: propertyName }}>
-								<StyledBtn iconBefore={EditIcon}>Photos</StyledBtn>
-							</Link>
+							<Tooltip content={<p style={{ fontSize: '12px', color: 'white', lineHeight: 0 }}>Edit property name and description</p>} position='right'>
+								<StyledBtn onClick={handleOpenEditPropertyOverlay} iconBefore={EditIcon}>
+									Property Info
+								</StyledBtn>
+							</Tooltip>
+							<Tooltip content={<p style={{ fontSize: '12px', color: 'white', lineHeight: 0 }}>Upload and delete property photos</p>} position='right'>
+								<Link to={`/photos/${propertyName}`} state={{ propertyName: propertyName }}>
+									<StyledBtn iconBefore={EditIcon}>Photos</StyledBtn>
+								</Link>
+							</Tooltip>
 						</BtnContainer>
 					</TitleContainer>
 					{galleryArray && !loading ? (
 						<ImgGalContainer>
-							<ImageGallery enableImageSelection={false} galleryViewportStyle={galleryViewportStyles} rowHeight={100} displayBtns={false} galleryArray={galleryArray} />
+							<ImageGallery enableImageSelection={false} galleryViewportStyle={galleryViewportStyles} rowHeight={100} galleryArray={galleryArray} />
 						</ImgGalContainer>
 					) : (
 						<h2>Loading Images</h2>
@@ -159,6 +164,7 @@ export default function Card({ propertyName, propertyDescription, amenities }: R
 			) : (
 				<></>
 			)}
+			<EditPropertyOverlay isShown={openEditPropertyOverlay} propertyName={propertyName} handleOpenEditPropertyOverlay={handleOpenEditPropertyOverlay} />
 		</StyledCard>
 	);
 }

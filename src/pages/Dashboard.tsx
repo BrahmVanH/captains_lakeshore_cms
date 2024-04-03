@@ -3,7 +3,7 @@ import * as Auth from '../lib/auth';
 
 import Login from '../components/Login';
 import { useQuery } from '@apollo/client';
-import { GET_PROPERTY_INFO } from '../lib/queries';
+import { GET_PROPERTIES, GET_PROPERTY_INFO } from '../lib/queries';
 import { Property } from '../lib/__generated__/graphql';
 import Card from '../components/Card';
 import styled from 'styled-components';
@@ -17,13 +17,13 @@ const LoginCardContainer = styled.div`
 `;
 
 export default function Dashboard() {
-	const [propertyInfo, setPropertyInfo] = useState<Property[] | null>(null);
+	const [properties, setProperties] = useState<Property[] | null>(null);
 
-	const { loading, error, data } = useQuery(GET_PROPERTY_INFO);
+	const { loading, error, data } = useQuery(GET_PROPERTIES);
 
 	useEffect(() => {
-		if (data?.getPropertyInfo && !loading && !error) {
-			setPropertyInfo(data.getPropertyInfo as Property[]);
+		if (data?.getProperties && !loading && !error) {
+			setProperties(data.getProperties as Property[]);
 		}
 	}, [data]);
 
@@ -33,18 +33,14 @@ export default function Dashboard() {
 		}
 	}, [error]);
 
-	useEffect(() => {
-		console.log(propertyInfo);
-	}, [propertyInfo]);
-
 	return (
 		<>
 			{Auth.loggedIn() ? (
 				<>
-					{propertyInfo ? (
+					{properties ? (
 						<div style={{ display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center', marginTop: '2rem' }}>
-							{propertyInfo.map((property) => (
-								<Card propertyName={property.propertyName} propertyDescription={property.propertyDescription} amenities={property.amenities} />
+							{properties.map((property) => (
+								<Card key={property.propertyName} propertyName={property.propertyName} />
 							))}
 						</div>
 					) : (

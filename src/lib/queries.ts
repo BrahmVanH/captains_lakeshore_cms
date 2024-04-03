@@ -66,14 +66,27 @@ export const GET_ABOUT_IMGS = gql(/* GraphQL */ `
 `);
 
 export const GET_PROPERTY_INFO = gql(/* GraphQL */ `
-	query GetPropertyInfo {
-		getPropertyInfo {
+	query GetPropertyInfo($propertyName: String!) {
+		getPropertyInfo(propertyName: $propertyName) {
 			propertyName
 			propertyDescription
 			amenities {
 				amenityName
 				amenityType
-			
+			}
+			headerImgKey
+		}
+	}
+`);
+
+export const GET_PROPERTIES = gql(/* GraphQL */ `
+	query GetProperties {
+		getProperties {
+			propertyName
+			propertyDescription
+			amenities {
+				amenityName
+				amenityType
 			}
 			headerImgKey
 		}

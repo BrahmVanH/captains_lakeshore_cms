@@ -59,3 +59,17 @@ export const DELETE_BOOKING = gql(/* GraphQL */ `
 		}
 	}
 `);
+
+export const UPDATE_PROPERTY_INFO = gql(/* GraphQL */ `
+	mutation UpdatePropertyInfo($input: UpdatePropertyInput!) {
+		updatePropertyInfo(input: $input) {
+			propertyName
+			propertyDescription
+			amenities {
+				amenityName
+				amenityType
+			}
+			headerImgKey
+		}
+	}
+`);

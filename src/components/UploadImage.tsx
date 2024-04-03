@@ -19,6 +19,8 @@ const UploadFormWrapper = styled.div(
 	margin: auto;
 	padding: 1rem;
 	height: 35vh;
+	box-shadow: 0 0 10px 0 ${theme.primary};
+
 `
 );
 

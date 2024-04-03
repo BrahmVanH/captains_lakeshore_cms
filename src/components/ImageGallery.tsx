@@ -19,8 +19,8 @@ export default function ImageGallery({
 	rowHeight: number;
 	galleryViewportStyle: React.CSSProperties;
 	enableImageSelection: boolean;
-	selectAllImages: boolean;
-	deleteSelectedImages: boolean;
+	selectAllImages?: boolean;
+	deleteSelectedImages?: boolean;
 }>) {
 	const [formattedGalArr, setFormattedGalArr] = useState<Image[] | null>(null);
 	const [selectedImages, setSelectedImages] = useState<Image[]>([]);
