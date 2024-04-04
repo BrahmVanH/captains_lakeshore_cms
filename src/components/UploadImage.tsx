@@ -132,40 +132,44 @@ export default function UploadImage({ propertyName }: Readonly<{ propertyName: s
 	// 	uploadBtn.current?.removeAttribute('disabled');
 	// }, [uploadBtn]);
 
-	const handleImageUpload = useCallback(async () => {
-		if (!altInput || files.length === 0) {
-			console.error('Alt tag and image are required');
-			return;
-		}
-		console.log('uploading image:', files[0], altInput, keyPrefix);
-		try {
-			const { data, error } = await getPresignedUrl({
-				variables: {
-					imgKey: `${keyPrefix}/${files[0].name}`,
-					commandType: 'put',
-					altTag: altInput,
-				},
-			});
-			console.log(data);
-			if (error || !data) {
-				throw new Error('Error fetching presigned URL' + error?.message);
+	const handleImageUpload = useCallback(
+		async (event: any) => {
+			event.preventDefault();
+			if (!altInput || files.length === 0) {
+				console.error('Alt tag and image are required');
+				return;
 			}
-			const response = await uploadImgToS3(files[0], data.getPresignedS3Url, altInput);
+			console.log('uploading image:', files[0], altInput, keyPrefix);
+			try {
+				const { data, error } = await getPresignedUrl({
+					variables: {
+						imgKey: `${keyPrefix}/${files[0].name}`,
+						commandType: 'put',
+						altTag: altInput,
+					},
+				});
+				console.log(data);
+				if (error || !data) {
+					throw new Error('Error fetching presigned URL' + error?.message);
+				}
+				const response = await uploadImgToS3(files[0], data.getPresignedS3Url, altInput);
 
-			if (!response.ok) {
-				throw new Error('Error in upload POST fetch: ' + response.statusText);
+				if (!response.ok) {
+					throw new Error('Error in upload POST fetch: ' + response.statusText);
+				}
+				console.log('Image uploaded successfully', response);
+			} catch (error: any) {
+				console.error(error);
+				throw new Error('Failed to upload image to S3' + error.message);
 			}
-			console.log('Image uploaded successfully', response);
-		} catch (error: any) {
-			console.error(error);
-			throw new Error('Failed to upload image to S3' + error.message);
-		}
-	}, [keyPrefix]);
+		},
+		[keyPrefix, altInput, files, getPresignedUrl]
+	);
 
 	useEffect(() => {
-		if (propertyName === 'hideaway') {
+		if (propertyName === "Captain's Hideaway") {
 			setKeyPrefix('captains_hideaway_png');
-		} else if (propertyName === 'cottage') {
+		} else if (propertyName === "Captain's Cottage") {
 			setKeyPrefix('captains_cottage_png');
 		}
 	}, [propertyName]);
@@ -212,9 +216,9 @@ export default function UploadImage({ propertyName }: Readonly<{ propertyName: s
 				/>
 
 				<Tooltip content={<p style={{ fontSize: '12px', color: 'white', lineHeight: 'normal' }}>Please enter a brief, descriptive tag for this image</p>}>
-						<StyledTextInput {...register('altInput', { disabled: altInputDisabled, onChange: handleInputChange })} type='text' placeholder='Alt Tag' />
+					<StyledTextInput {...register('altInput', { disabled: altInputDisabled, onChange: handleInputChange })} type='text' placeholder='Alt Tag' />
 				</Tooltip>
-				<SButton type='submit' onClick={handleImageUpload} iconBefore={CloudUploadIcon}>
+				<SButton onClick={handleImageUpload} iconBefore={CloudUploadIcon}>
 					Upload
 				</SButton>
 			</Form>

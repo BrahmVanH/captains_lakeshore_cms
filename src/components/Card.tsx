@@ -8,7 +8,7 @@ import { Button, EditIcon, Tooltip } from 'evergreen-ui';
 import ImageGallery from './ImageGallery';
 import EditPropertyOverlay from './EditPropertyOverlay';
 
-import { GalImg, IProperty } from '../types';
+import { GalImg } from '../types';
 import styled from 'styled-components';
 import { Link } from 'react-router-dom';
 import { Property } from '../lib/__generated__/graphql';
