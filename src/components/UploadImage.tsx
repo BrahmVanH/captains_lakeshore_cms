@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useState, useRef } from 'react';
 import { useLazyQuery } from '@apollo/client';
-import { useForm, FieldValues } from 'react-hook-form';
+import { useForm, FieldValues, Controller } from 'react-hook-form';
 import { GET_PRESEIGNED_URL } from '../lib/queries';
 import { uploadImgToS3 } from '../lib/s3';
 import styled from 'styled-components';
@@ -37,11 +37,12 @@ interface InputSCProps {
 
 const Input = styled.input<InputSCProps>(
 	({ $isFileSet }) => `
-width: 30%;
-margin: 1rem;
-background-color: ${$isFileSet ? 'white' : 'transparent'};
-border: ${$isFileSet ? '1px solid black' : 'none'};
-color: ${$isFileSet ? 'black' : 'transparent'};
+	display: ${$isFileSet ? 'block' : 'none'};
+	width: 30%;
+	margin: 1rem;
+	background-color: white;
+	border: 1px solid black;
+	color: black;
 `
 );
 
@@ -61,15 +62,16 @@ export default function UploadImage({ propertyName }: Readonly<{ propertyName: s
 	const {
 		register,
 		handleSubmit,
+		control,
 		formState: { errors },
 	} = useForm();
-	const { ref: imgRef, ...restImg } = register('image', { required: true });
-	const { ref: altRef, ...restAlt } = register('altTag', { required: true });
+	const registeredImg = register('image', { required: true });
 
 	const [input, setInput] = useState<FieldValues | null>(null);
 	const [keyPrefix, setKeyPrefix] = useState<string>('');
 	const [fileName, setFileName] = useState<string>('');
 	const [isFileSet, setIsFileSet] = useState<boolean>(false);
+	const [image, setImage] = useState<string | number | readonly string[] | undefined>(undefined);
 
 	// const altInputRef = useRef<HTMLInputElement>(null);
 
@@ -78,16 +80,12 @@ export default function UploadImage({ propertyName }: Readonly<{ propertyName: s
 	const hiddenInputRef = useRef<HTMLInputElement>(null);
 	const uploadBtn = useRef<HTMLButtonElement>(null);
 
-	// const triggerHiddenInput = useCallback(() => {
-	// 	if (hiddenInputRef.current) {
-	// 		hiddenInputRef.current.click();
-	// 	}
-	// }, [hiddenInputRef]);
-
 	const triggerHiddenInput = useCallback(() => {
 		// imgRef(hiddenInputRef.current);
-		hiddenInputRef.current?.click();
-	}, []);
+		if (hiddenInputRef.current) {
+			hiddenInputRef.current?.click();
+		}
+	}, [hiddenInputRef.current]);
 
 	// const setHiddenInputRef = useCallback(
 	// 	(e: any) => {
@@ -101,12 +99,26 @@ export default function UploadImage({ propertyName }: Readonly<{ propertyName: s
 	// 	[imgRef]
 	// );
 
-	const handleSetFileName = useCallback(() => {
-		// if (hiddenInputRef?.current?.files?.[0]) {
-		// 	setFileName(hiddenInputRef.current.files?.[0].name);
-		// 	setIsFileSet(true);
-		// }
+	// const handleSetFileName = useCallback(() => {
+	// 	if (hiddenInputRef?.current?.files?.[0]) {
+	// 		setFileName(hiddenInputRef.current.files?.[0].name);
+	// 		setIsFileSet(true);
+	// 	}
+	// }, [hiddenInputRef]);
+
+	useEffect(() => {
+		if (hiddenInputRef?.current?.files?.[0]) {
+			setFileName(hiddenInputRef?.current?.files[0].name);
+			setIsFileSet(true);
+		}
+		console.log('hiddenInputRef:', hiddenInputRef);
 	}, [hiddenInputRef]);
+
+	useEffect(() => {
+		if (image) {
+			console.log('image:', image);
+		}
+	}, [image]);
 
 	// const handleEnableBtn = useCallback(() => {
 	// 	uploadBtn.current?.removeAttribute('disabled');
@@ -142,13 +154,6 @@ export default function UploadImage({ propertyName }: Readonly<{ propertyName: s
 	);
 
 	useEffect(() => {
-		if (input) {
-			console.log('input:', input);
-			handleImageUpload(input);
-		}
-	}, [input, handleImageUpload]);
-
-	useEffect(() => {
 		if (propertyName === 'hideaway') {
 			setKeyPrefix('captains_hideaway_png');
 		} else if (propertyName === 'cottage') {
@@ -156,17 +161,24 @@ export default function UploadImage({ propertyName }: Readonly<{ propertyName: s
 		}
 	}, [propertyName]);
 
+	useEffect(() => {
+		if (control) {
+			console.log('control:', control);
+		}
+	}, [control]);
+
 	return (
 		<UploadFormWrapper>
 			<h1 style={{ color: 'white' }}>Upload Image</h1>
-			<Form onSubmit={handleSubmit((data) => setInput(data))}>
-				<HiddenInput {...restImg} onChange={handleSetFileName} ref={hiddenInputRef} type='file' />
+			<Form onSubmit={handleSubmit(handleImageUpload)}>
+				<Controller control={control} name='image' render={({ field: { ref, name } }) => <HiddenInput name={name} ref={hiddenInputRef} type='file' />} />
+
 				{errors.image && <span style={{ color: 'red' }}>This field is required</span>}
 				<SButton onClick={triggerHiddenInput} iconBefore={ImportIcon} type='button' appearance='minimal'>
 					Choose File
 				</SButton>
 				{fileName && <span style={{ color: 'white' }}>{fileName}</span>}
-				<Input $isFileSet={isFileSet} {...restAlt} type='text' placeholder='alt tag' />
+				<Input $isFileSet={isFileSet} {...register('altTag', { required: true })} type='text' placeholder='alt tag' />
 				{errors.altTag && <span style={{ color: 'red' }}>This field is required</span>}
 				<SButton type='submit' iconBefore={CloudUploadIcon}>
 					Upload
