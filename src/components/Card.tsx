@@ -11,6 +11,7 @@ import EditPropertyOverlay from './EditPropertyOverlay';
 import { GalImg, IProperty } from '../types';
 import styled from 'styled-components';
 import { Link } from 'react-router-dom';
+import { Property } from '../lib/__generated__/graphql';
 
 const StyledCard = styled.div`
 	width: 80%;
@@ -54,7 +55,7 @@ const StyledBtn = styled(Button)`
 	margin-bottom: 1rem;
 `;
 
-export default function Card({ propertyName }: Readonly<{ propertyName: string }>) {
+export default function Card({ property }: Readonly<{ property: Property }>) {
 	const [galleryArray, setGalleryArray] = useState<GalImg[] | null>([]);
 	const [loading, setLoading] = useState<boolean>(false);
 	const [error, setError] = useState<any>(null);
@@ -82,49 +83,46 @@ export default function Card({ propertyName }: Readonly<{ propertyName: string }
 	}, []);
 
 	useEffect(() => {
-		console.log('property name:', propertyName);
-	}, [propertyName]);
+		console.log('property name:', property.propertyName);
+	}, [property.propertyName]);
 
-	const handleFetchImgs = useCallback(
-		async (propertyName: string) => {
-			console.log('fetching images');
-			try {
-				if (propertyName === "Captain's Hideaway") {
-					const { loading, error, data } = await getHideawayImages();
-					if (loading && !data) {
-						setLoading(loading);
-					}
-					if (!loading && data) {
-						setGalleryArray(data.getHideawayImgs.galleryArray as GalImg[]);
-					}
-
-					if (error) {
-						setError(error);
-						throw new Error('Error fetching images');
-					}
-				} else if (propertyName === "Captain's Cottage") {
-					const { loading, error, data } = await getCottageImages();
-					if (!loading && data) {
-						setGalleryArray(data.getCottageImgs.galleryArray as GalImg[]);
-					}
-					if (error) {
-						setError(error);
-						throw new Error('Error fetching images');
-					}
+	const handleFetchImgs = useCallback(async (propertyName: string) => {
+		console.log('fetching images');
+		try {
+			if (propertyName === "Captain's Hideaway") {
+				const { loading, error, data } = await getHideawayImages();
+				if (loading && !data) {
+					setLoading(loading);
 				}
-			} catch (error) {
-				console.error(error);
-				throw new Error('Error fetching images');
+				if (!loading && data) {
+					setGalleryArray(data.getHideawayImgs.galleryArray as GalImg[]);
+				}
+
+				if (error) {
+					setError(error);
+					throw new Error('Error fetching images');
+				}
+			} else if (propertyName === "Captain's Cottage") {
+				const { loading, error, data } = await getCottageImages();
+				if (!loading && data) {
+					setGalleryArray(data.getCottageImgs.galleryArray as GalImg[]);
+				}
+				if (error) {
+					setError(error);
+					throw new Error('Error fetching images');
+				}
 			}
-		},
-		[propertyName]
-	);
+		} catch (error) {
+			console.error(error);
+			throw new Error('Error fetching images');
+		}
+	}, []);
 
 	useEffect(() => {
-		if (propertyName) {
-			handleFetchImgs(propertyName);
+		if (property.propertyName) {
+			handleFetchImgs(property.propertyName);
 		}
-	}, [propertyName]);
+	}, [property]);
 
 	useEffect(() => {
 		if (error) {
@@ -134,11 +132,11 @@ export default function Card({ propertyName }: Readonly<{ propertyName: string }
 	return (
 		<StyledCard id='card'>
 			{/* {galleryArray && !loading ? <ImgUploadOverlay galleryArray={galleryArray} isShown={showOverlay} /> : <></>} */}
-			{propertyName ? (
+			{property.propertyName ? (
 				<CardContainer>
 					<TitleContainer>
 						<div>
-							<h1>{propertyName}</h1>
+							<h1>{property.propertyName}</h1>
 						</div>
 						<BtnContainer>
 							<Tooltip content={<p style={{ fontSize: '12px', color: 'white', lineHeight: 0 }}>Edit property name and description</p>} position='right'>
@@ -147,7 +145,7 @@ export default function Card({ propertyName }: Readonly<{ propertyName: string }
 								</StyledBtn>
 							</Tooltip>
 							<Tooltip content={<p style={{ fontSize: '12px', color: 'white', lineHeight: 0 }}>Upload and delete property photos</p>} position='right'>
-								<Link to={`/photos/${propertyName}`} state={{ propertyName: propertyName }}>
+								<Link to={`/photos/${property.propertyName}`} state={{ propertyName: property.propertyName }}>
 									<StyledBtn iconBefore={EditIcon}>Photos</StyledBtn>
 								</Link>
 							</Tooltip>
@@ -164,7 +162,7 @@ export default function Card({ propertyName }: Readonly<{ propertyName: string }
 			) : (
 				<></>
 			)}
-			<EditPropertyOverlay isShown={openEditPropertyOverlay} propertyName={propertyName} handleOpenEditPropertyOverlay={handleOpenEditPropertyOverlay} />
+			<EditPropertyOverlay isShown={openEditPropertyOverlay} property={property} handleOpenEditPropertyOverlay={handleOpenEditPropertyOverlay} />
 		</StyledCard>
 	);
 }

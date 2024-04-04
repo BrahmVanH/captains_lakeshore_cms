@@ -10,9 +10,7 @@ export interface GalImg extends ImageObject {
 	isSelected: boolean;
 }
 
-export interface IProperty extends Property {
-	headerImgKey?: string;
-}
+
 
 export interface SideBarSCProps {
 	$isOpen: boolean;

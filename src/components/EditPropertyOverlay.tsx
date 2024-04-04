@@ -1,11 +1,12 @@
 import { BoxProps, Overlay } from 'evergreen-ui';
 import EditProperty from './EditProperty';
+import { Property } from '../lib/__generated__/graphql';
 
 export default function ImgUploadOverlay({
 	isShown,
-	propertyName,
+	property,
 	handleOpenEditPropertyOverlay,
-}: Readonly<{ isShown: boolean; propertyName: string; handleOpenEditPropertyOverlay: (show: boolean) => void }>) {
+}: Readonly<{ isShown: boolean; property: Property; handleOpenEditPropertyOverlay: (show: boolean) => void }>) {
 	const containerProps: BoxProps<'div'> = {
 		style: {
 			display: 'flex',
@@ -25,7 +26,7 @@ export default function ImgUploadOverlay({
 			shouldCloseOnClick={false}
 			preventBodyScrolling={true}
 			isShown={isShown}>
-			{propertyName ? <EditProperty propertyName={propertyName} /> : <></>}
+			{property ? <EditProperty property={property} /> : <></>}
 		</Overlay>
 	);
 }

@@ -83,13 +83,10 @@ function Navbar() {
 			) : (
 				<LinkContainer>
 					<StyledLink to={'/'} className='navbar-link'>
-						Home
+						Dashboard
 					</StyledLink>
-					<StyledLink to={'/about'} className='navbar-link'>
-						About Us
-					</StyledLink>
-					<StyledLink to={'/contact'} className='navbar-link'>
-						Contact
+					<StyledLink to={'https://lakesuperiorcaptains.com'} target='_blank' className='navbar-link'>
+						User Site
 					</StyledLink>
 					{Auth.loggedIn() ? (
 						<StyledLink to='/' onClick={() => Auth.logout()} className='navbar-link'>
@@ -102,13 +99,10 @@ function Navbar() {
 			)}
 			<div ref={dropdownMenu} id='navbar-dropdown' className=' hidden .flex .items-center .flex-col .m-auto .w-full .border .rounded-bl-lg .rounded-br-lg .bg-blue-500 .text-white .absolute .z-50'>
 				<StyledLink to={'/'} className='navbar-link'>
-					Home
+					Dashboard
 				</StyledLink>
-				<StyledLink to={'/about'} className='navbar-link'>
-					About Us
-				</StyledLink>
-				<StyledLink to={'/contact'} className='navbar-link'>
-					Contact
+				<StyledLink to={'https://lakesuperiorcaptains.com'} target='_blank' className='navbar-link'>
+					User Site
 				</StyledLink>
 				{Auth.loggedIn() ? (
 					<StyledLink to='/' onClick={() => Auth.logout()} className='navbar-link'>

@@ -40,7 +40,7 @@ export default function Dashboard() {
 					{properties ? (
 						<div style={{ display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center', marginTop: '2rem' }}>
 							{properties.map((property) => (
-								<Card key={property.propertyName} propertyName={property.propertyName} />
+								<Card key={property._id} property={property} />
 							))}
 						</div>
 					) : (

@@ -66,8 +66,9 @@ export const GET_ABOUT_IMGS = gql(/* GraphQL */ `
 `);
 
 export const GET_PROPERTY_INFO = gql(/* GraphQL */ `
-	query GetPropertyInfo($propertyName: String!) {
-		getPropertyInfo(propertyName: $propertyName) {
+	query GetPropertyInfo($_id: ID!) {
+		getPropertyInfo(_id: $_id) {
+			_id
 			propertyName
 			propertyDescription
 			amenities {
@@ -82,6 +83,7 @@ export const GET_PROPERTY_INFO = gql(/* GraphQL */ `
 export const GET_PROPERTIES = gql(/* GraphQL */ `
 	query GetProperties {
 		getProperties {
+			_id
 			propertyName
 			propertyDescription
 			amenities {
