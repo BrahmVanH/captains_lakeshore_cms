@@ -4,7 +4,7 @@ import { useForm, FieldValues, Controller } from 'react-hook-form';
 import { GET_PRESEIGNED_URL } from '../lib/queries';
 import { uploadImgToS3 } from '../lib/s3';
 import styled from 'styled-components';
-import { Button, CloudUploadIcon, ImportIcon } from 'evergreen-ui';
+import { Button, CloudUploadIcon, ImportIcon, FileUploader, TextInput, FileCard, FileRejection, Tooltip } from 'evergreen-ui';
 
 const UploadFormWrapper = styled.div(
 	({ theme }) => `
@@ -18,7 +18,7 @@ const UploadFormWrapper = styled.div(
 	border: 1px solid white;
 	margin: auto;
 	padding: 1rem;
-	height: 35vh;
+	height: min-content;
 	box-shadow: 0 0 10px 0 ${theme.primary};
 
 `
@@ -35,16 +35,17 @@ interface InputSCProps {
 	$isFileSet: boolean;
 }
 
-const Input = styled.input<InputSCProps>(
-	({ $isFileSet }) => `
-	display: ${$isFileSet ? 'block' : 'none'};
+const StyledTextInput = styled(TextInput)`
 	width: 30%;
 	margin: 1rem;
 	background-color: white;
 	border: 1px solid black;
 	color: black;
-`
-);
+
+	&:disabled {
+		background-color: lightgrey;
+	}
+`;
 
 const SButton = styled(Button)`
 	color: white;
@@ -62,42 +63,49 @@ export default function UploadImage({ propertyName }: Readonly<{ propertyName: s
 	const {
 		register,
 		handleSubmit,
-		control,
 		formState: { errors },
 	} = useForm();
-	const registeredImg = register('image', { required: true });
 
-	const [input, setInput] = useState<FieldValues | null>(null);
+	const [altInput, setAltInput] = useState<string | null>(null);
 	const [keyPrefix, setKeyPrefix] = useState<string>('');
 	const [fileName, setFileName] = useState<string>('');
 	const [isFileSet, setIsFileSet] = useState<boolean>(false);
 	const [image, setImage] = useState<string | number | readonly string[] | undefined>(undefined);
+	const [altInputDisabled, setAltInputDisabled] = useState<boolean>(true);
+	const [files, setFiles] = useState<File[]>([]);
+	const [fileRejections, setFileRejections] = useState<FileRejection[]>([]);
+	const handleChange = useCallback((files: File[]) => setFiles([files[0]]), []);
+	const handleRejected = useCallback((fileRejections: FileRejection[]) => setFileRejections([fileRejections[0]]), []);
+	const handleRemove = useCallback(() => {
+		setFiles([]);
+		setFileRejections([]);
+	}, []);
 
 	// const altInputRef = useRef<HTMLInputElement>(null);
 
 	const [getPresignedUrl] = useLazyQuery(GET_PRESEIGNED_URL);
 
-	const hiddenInputRef = useRef<HTMLInputElement>(null);
-	const uploadBtn = useRef<HTMLButtonElement>(null);
+	const altInputRef = useRef<HTMLDivElement>(null);
 
-	const triggerHiddenInput = useCallback(() => {
-		// imgRef(hiddenInputRef.current);
-		if (hiddenInputRef.current) {
-			hiddenInputRef.current?.click();
-		}
-	}, [hiddenInputRef.current]);
+	// const triggerHiddenInput = useCallback(() => {
+	// 	// imgRef(hiddenInputRef.current);
+	// 	if (hiddenInputRef.current) {
+	// 		hiddenInputRef.current?.click();
+	// 	}
+	// }, [hiddenInputRef.current]);
 
-	// const setHiddenInputRef = useCallback(
-	// 	(e: any) => {
-	// 		if (!imgRef) return;
-	// 		console.log('e: ', e);
-	// 		// hiddenInputRef.current = e;
-	// 		imgRef(e);
-	// 		console.log('e:', e);
+	const handleInputChange = useCallback(
+		(event: React.ChangeEvent<HTMLInputElement>) => {
+			const { value } = event.target;
+			setAltInput(value);
+		},
+		[altInput]
+	);
 
-	// 	},
-	// 	[imgRef]
-	// );
+	const handleDisableAltInput = useCallback((isDisabled: boolean) => {
+		console.log('altInputRef:', altInputRef);
+		setAltInputDisabled(isDisabled);
+	}, []);
 
 	// const handleSetFileName = useCallback(() => {
 	// 	if (hiddenInputRef?.current?.files?.[0]) {
@@ -106,13 +114,13 @@ export default function UploadImage({ propertyName }: Readonly<{ propertyName: s
 	// 	}
 	// }, [hiddenInputRef]);
 
-	useEffect(() => {
-		if (hiddenInputRef?.current?.files?.[0]) {
-			setFileName(hiddenInputRef?.current?.files[0].name);
-			setIsFileSet(true);
-		}
-		console.log('hiddenInputRef:', hiddenInputRef);
-	}, [hiddenInputRef]);
+	// useEffect(() => {
+	// 	if (hiddenInputRef?.current?.files?.[0]) {
+	// 		setFileName(hiddenInputRef?.current?.files[0].name);
+	// 		setIsFileSet(true);
+	// 	}
+	// 	console.log('hiddenInputRef:', hiddenInputRef);
+	// }, [hiddenInputRef]);
 
 	useEffect(() => {
 		if (image) {
@@ -124,34 +132,35 @@ export default function UploadImage({ propertyName }: Readonly<{ propertyName: s
 	// 	uploadBtn.current?.removeAttribute('disabled');
 	// }, [uploadBtn]);
 
-	const handleImageUpload = useCallback(
-		async ({ image, altTag }: FieldValues) => {
-			console.log('uploading image:', image[0].name, altTag, keyPrefix);
-			try {
-				const { data, error } = await getPresignedUrl({
-					variables: {
-						imgKey: `${keyPrefix}/${image[0].name}`,
-						commandType: 'put',
-						altTag,
-					},
-				});
-				console.log(data);
-				if (error || !data) {
-					throw new Error('Error fetching presigned URL' + error?.message);
-				}
-				const response = await uploadImgToS3(image[0], data.getPresignedS3Url, altTag);
-
-				if (!response.ok) {
-					throw new Error('Error in upload POST fetch: ' + response.statusText);
-				}
-				console.log('Image uploaded successfully', response);
-			} catch (error: any) {
-				console.error(error);
-				throw new Error('Failed to upload image to S3' + error.message);
+	const handleImageUpload = useCallback(async () => {
+		if (!altInput || files.length === 0) {
+			console.error('Alt tag and image are required');
+			return;
+		}
+		console.log('uploading image:', files[0], altInput, keyPrefix);
+		try {
+			const { data, error } = await getPresignedUrl({
+				variables: {
+					imgKey: `${keyPrefix}/${files[0].name}`,
+					commandType: 'put',
+					altTag: altInput,
+				},
+			});
+			console.log(data);
+			if (error || !data) {
+				throw new Error('Error fetching presigned URL' + error?.message);
 			}
-		},
-		[keyPrefix]
-	);
+			const response = await uploadImgToS3(files[0], data.getPresignedS3Url, altInput);
+
+			if (!response.ok) {
+				throw new Error('Error in upload POST fetch: ' + response.statusText);
+			}
+			console.log('Image uploaded successfully', response);
+		} catch (error: any) {
+			console.error(error);
+			throw new Error('Failed to upload image to S3' + error.message);
+		}
+	}, [keyPrefix]);
 
 	useEffect(() => {
 		if (propertyName === 'hideaway') {
@@ -162,25 +171,50 @@ export default function UploadImage({ propertyName }: Readonly<{ propertyName: s
 	}, [propertyName]);
 
 	useEffect(() => {
-		if (control) {
-			console.log('control:', control);
+		if (files.length > 0) {
+			console.log('files length greater than 0:', files);
+			handleDisableAltInput(false);
 		}
-	}, [control]);
+	}, [files]);
+
+	useEffect(() => {
+		if (altInput) {
+			console.log('altInput:', altInput);
+		}
+	}, [altInput]);
+
+	useEffect(() => {
+		console.log('altInputRef:', altInputRef);
+	}, [altInputRef]);
+
+	useEffect(() => {
+		if (files.length > 0) {
+			console.log('files:', files);
+		}
+	}, [files]);
 
 	return (
 		<UploadFormWrapper>
 			<h1 style={{ color: 'white' }}>Upload Image</h1>
-			<Form onSubmit={handleSubmit(handleImageUpload)}>
-				<Controller control={control} name='image' render={({ field: { ref, name } }) => <HiddenInput name={name} ref={hiddenInputRef} type='file' />} />
+			<Form>
+				<FileUploader
+					maxSizeInBytes={50 * 1024 ** 2}
+					maxFiles={1}
+					onChange={handleChange}
+					onRejected={handleRejected}
+					renderFile={(file) => {
+						const { name, size, type } = file;
+						const fileRejection = fileRejections.find((fileRejection) => fileRejection.file === file);
+						const { message } = fileRejection || {};
+						return <FileCard key={name} name={name} isInvalid={fileRejection != null} onRemove={handleRemove} sizeInBytes={size} type={type} validationMessage={message} />;
+					}}
+					values={files}
+				/>
 
-				{errors.image && <span style={{ color: 'red' }}>This field is required</span>}
-				<SButton onClick={triggerHiddenInput} iconBefore={ImportIcon} type='button' appearance='minimal'>
-					Choose File
-				</SButton>
-				{fileName && <span style={{ color: 'white' }}>{fileName}</span>}
-				<Input $isFileSet={isFileSet} {...register('altTag', { required: true })} type='text' placeholder='alt tag' />
-				{errors.altTag && <span style={{ color: 'red' }}>This field is required</span>}
-				<SButton type='submit' iconBefore={CloudUploadIcon}>
+				<Tooltip content={<p style={{ fontSize: '12px', color: 'white', lineHeight: 'normal' }}>Please enter a brief, descriptive tag for this image</p>}>
+						<StyledTextInput {...register('altInput', { disabled: altInputDisabled, onChange: handleInputChange })} type='text' placeholder='Alt Tag' />
+				</Tooltip>
+				<SButton type='submit' onClick={handleImageUpload} iconBefore={CloudUploadIcon}>
 					Upload
 				</SButton>
 			</Form>
