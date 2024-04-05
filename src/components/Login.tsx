@@ -111,11 +111,15 @@ export default function Login() {
 
 	const handleLogin = useCallback(
 		async (loginFormData: FieldValues) => {
+			const formattedLoginData = {
+				username: loginFormData.username.toLowerCase(),
+				userPassword: loginFormData.userPassword,
+			};
 			try {
 				const { data } = await loginUser({
 					variables: {
 						input: {
-							...(loginFormData as LoginUserInput),
+							...(formattedLoginData as LoginUserInput),
 						},
 					},
 				});
