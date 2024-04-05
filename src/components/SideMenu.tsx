@@ -1,6 +1,6 @@
 // Sidebar.js
 
-import { useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import styled from 'styled-components';
 import { Button, Icon, PinIcon, UnpinIcon, DeleteIcon, UploadIcon, MultiSelectIcon, Tooltip, MenuIcon } from 'evergreen-ui';
 import { SideBarSCProps, MenuItemsSCProps } from '../types';
@@ -12,7 +12,7 @@ const SidebarContainer = styled.div<SideBarSCProps>(({ theme, $isOpen }) => ({
 	position: 'absolute',
 	bottom: '50%',
 	left: '-6rem',
-	zIndex: '1000',
+	zIndex: '15',
 	width: '7.5rem',
 	height: '30vh',
 	alignItems: 'center',
@@ -136,6 +136,9 @@ export default function SideMenu({
 	const [isOpen, setIsOpen] = useState<boolean>(false);
 	const [isPinned, setIsPinned] = useState<boolean>(false);
 	const menuRef = useRef<HTMLDivElement>(null);
+	const uploadBtn = useRef<HTMLButtonElement>(null);
+	const deleteBtn = useRef<HTMLButtonElement>(null);
+	const selectAllBtn = useRef<HTMLButtonElement>(null);
 
 	const handlePinSidebar = (event: any) => {
 		event.preventDefault();
@@ -148,13 +151,32 @@ export default function SideMenu({
 		}
 	}, [propertyName]);
 
+	const handleEnableMenuBtns = useCallback(() => {
+		if (uploadBtn.current && deleteBtn.current && selectAllBtn.current) {
+			uploadBtn.current.disabled = false;
+			deleteBtn.current.disabled = false;
+			selectAllBtn.current.disabled = false;
+		}
+	}, []);
+
+	const handleDisableMenuBtns = useCallback(() => {
+		if (uploadBtn.current && deleteBtn.current && selectAllBtn.current) {
+			uploadBtn.current.disabled = true;
+			deleteBtn.current.disabled = true;
+			selectAllBtn.current.disabled = true;
+		}
+	}, []);
+
 	const handleOpenMenu = () => {
 		setIsOpen(true);
+		handleEnableMenuBtns();
 	};
+
 
 	const handleCloseMenu = () => {
 		if (!isPinned) {
 			setIsOpen(false);
+			handleDisableMenuBtns();
 		}
 	};
 
@@ -175,13 +197,13 @@ export default function SideMenu({
 				{isOpen ? <Icon icon={UnpinIcon} color='white' size={12} /> : <Icon icon={PinIcon} color='white' size={12} />}
 			</ControlBtn> */}
 			<MenuItems $isOpen={isOpen}>
-				<MenuOptionBtn onClick={() => handleUploadOverlay(true)} iconAfter={UploadIcon} appearance='minimal'>
+				<MenuOptionBtn onClick={() => handleUploadOverlay(true)} ref={uploadBtn} iconAfter={UploadIcon} appearance='minimal'>
 					Upload
 				</MenuOptionBtn>
-				<MenuOptionBtn onClick={handleDeleteSelected} iconAfter={DeleteIcon} appearance='minimal'>
+				<MenuOptionBtn onClick={handleDeleteSelected} ref={deleteBtn} iconAfter={DeleteIcon} appearance='minimal'>
 					Delete
 				</MenuOptionBtn>
-				<MenuOptionBtn onClick={handleSetSelectAll} iconAfter={MultiSelectIcon} appearance='minimal'>
+				<MenuOptionBtn onClick={handleSetSelectAll} ref={selectAllBtn} iconAfter={MultiSelectIcon} appearance='minimal'>
 					Select All
 				</MenuOptionBtn>
 			</MenuItems>

@@ -59,7 +59,6 @@ const StyledBtn = styled(Button)`
 export default function Card({ property }: Readonly<{ property: Property }>) {
 	const [galleryArray, setGalleryArray] = useState<GalImg[] | null>([]);
 	const [imgsLoading, setImgsLoading] = useState<boolean>(false);
-	const [galleryIsLoading, setGalleryIsLoading] = useState<boolean>(false);
 	const [loading, setLoading] = useState<boolean>(false);
 	const [error, setError] = useState<any>(null);
 	const [getCottageImages] = useLazyQuery(GET_COTTAGE_IMGS);
@@ -83,10 +82,6 @@ export default function Card({ property }: Readonly<{ property: Property }>) {
 		} else {
 			setOpenEditPropertyOverlay(false);
 		}
-	}, []);
-
-	const handleSetGalleryIsLoading = useCallback((isLoading: boolean) => {
-		setGalleryIsLoading(isLoading);
 	}, []);
 
 	useEffect(() => {
@@ -132,7 +127,7 @@ export default function Card({ property }: Readonly<{ property: Property }>) {
 	}, [property]);
 
 	useEffect(() => {
-		if (!galleryIsLoading && !imgsLoading) {
+		if (!imgsLoading) {
 			setLoading(false);
 		} else {
 			setLoading(true);
@@ -168,7 +163,7 @@ export default function Card({ property }: Readonly<{ property: Property }>) {
 					</TitleContainer>
 
 					<ImgGalContainer>
-						<ImageGallery handleSetGalleryIsLoading={handleSetGalleryIsLoading} enableImageSelection={false} galleryViewportStyle={galleryViewportStyles} rowHeight={100} galleryArray={galleryArray} />
+						<ImageGallery enableImageSelection={false} galleryViewportStyle={galleryViewportStyles} rowHeight={100} galleryArray={galleryArray} />
 					</ImgGalContainer>
 				</CardContainer>
 			) : (

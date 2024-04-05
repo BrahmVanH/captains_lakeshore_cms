@@ -2,10 +2,10 @@ import { useCallback, useEffect, useRef, useState } from 'react';
 import { Gallery, Image } from 'react-grid-gallery';
 // import { useMutation } from '@apollo/client';
 import { GalImg } from '../types';
-import { useLazyQuery } from '@apollo/client';
+import { useLazyQuery, useMutation } from '@apollo/client';
 import { GET_PRESEIGNED_URL } from '../lib/queries';
-import { deleteImgFromS3 } from '../lib/s3';
 import { set } from 'react-hook-form';
+import { DELETE_S3_IMG } from '../lib/mutations';
 // import { Button } from 'evergreen-ui';
 
 export default function ImageGallery({
@@ -15,7 +15,6 @@ export default function ImageGallery({
 	enableImageSelection,
 	selectAllImages,
 	deleteSelectedImages,
-	handleSetGalleryIsLoading,
 }: Readonly<{
 	galleryArray: GalImg[];
 	rowHeight: number;
@@ -23,16 +22,13 @@ export default function ImageGallery({
 	enableImageSelection: boolean;
 	selectAllImages?: boolean;
 	deleteSelectedImages?: boolean;
-	handleSetGalleryIsLoading: (isLoading: boolean) => void;
 }>) {
 	const [formattedGalArr, setFormattedGalArr] = useState<Image[] | null>(null);
 	const [selectedImages, setSelectedImages] = useState<Image[]>([]);
-	const btnsRef = useRef<HTMLButtonElement>(null);
-	const [isLoading, setIsLoading] = useState(true);
 
 	const hasSelected = galleryArray.some((img) => img.isSelected);
 
-	const [deleteImages] = useLazyQuery(GET_PRESEIGNED_URL);
+	const [deleteImages] = useMutation(DELETE_S3_IMG);
 
 	const handleImageFormat = useCallback(() => {
 		const formattedImages: Image[] = galleryArray.map((img) => {
@@ -47,7 +43,6 @@ export default function ImageGallery({
 		});
 
 		setFormattedGalArr(formattedImages);
-		setIsLoading(false);
 	}, [galleryArray]);
 
 	const handleSelect = useCallback(
@@ -62,6 +57,7 @@ export default function ImageGallery({
 				}
 				return img;
 			});
+
 			console.log('setting formattedGalArr:', nextImages);
 			const selectedImages = nextImages.filter((img) => img.isSelected);
 			setFormattedGalArr(nextImages);
@@ -91,15 +87,14 @@ export default function ImageGallery({
 
 	const handleDeleteSelected = useCallback(async () => {
 		try {
-			if (selectedImages.length < 1) return;
-			if (!selectedImages[0].key) return;
+			if (selectedImages.length < 1 || !selectedImages[0].key || !selectedImages[0].alt) return;
 			console.log('selectedImages:', selectedImages);
 			console.log('deleting selected image from s3 bucket');
 			const { data, error } = await deleteImages({
 				variables: {
-					imgKey: `${selectedImages[0].key}` ?? '',
+					imgKey: `${selectedImages[0].key}`,
 					commandType: 'delete',
-					altTag: selectedImages[0].alt ?? '',
+					altTag: selectedImages[0].alt,
 				},
 			});
 
@@ -137,10 +132,6 @@ export default function ImageGallery({
 	useEffect(() => {
 		handleImageFormat();
 	}, [galleryArray, handleImageFormat]);
-
-	useEffect(() => {
-		handleSetGalleryIsLoading(isLoading);
-	}, [isLoading]);
 
 	return (
 		<div id='imageGallery' style={{ maxHeight: '100vh' }}>

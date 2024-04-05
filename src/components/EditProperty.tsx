@@ -130,7 +130,8 @@ export default function EditProperty({ property }: Readonly<{ property: Property
 	// Reverts the property name and description input fields to the "original values" that were set
 	// on render before user modifications were made.
 
-	const handleDiscardChanges = useCallback(() => {
+	const handleDiscardChanges = useCallback((event: MouseEvent) => {
+		event.preventDefault();
 		if (!originalPropertyInfo?.propertyName || !originalPropertyInfo?.propertyDescription) {
 			console.error('No original property info provided');
 			return;
@@ -274,7 +275,7 @@ export default function EditProperty({ property }: Readonly<{ property: Property
 									Edit
 								</SButton>
 							) : (
-								<SButton onClick={handleDiscardChanges} appearance='minimal'>
+								<SButton  onClick={handleDiscardChanges} appearance='minimal'>
 									Discard
 								</SButton>
 							)}

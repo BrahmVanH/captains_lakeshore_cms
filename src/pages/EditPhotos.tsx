@@ -18,7 +18,8 @@ export default function EditPhotos() {
 	const [isShown, setIsShown] = useState<boolean>(false);
 	const [selectAllImages, setSelectAllImages] = useState<boolean>(false);
 	const [deleteSelectedImages, setDeleteSelectedImages] = useState<boolean>(false);
-	const [isLoading, setIsloading] = useState<boolean>(true);
+	const [loading, setLoading] = useState<boolean>(true);
+	const [imgsLoading, setImgsLoading] = useState<boolean>(true);
 
 	const [getHideawayImages] = useLazyQuery(GET_HIDEAWAY_IMGS);
 	const [getCottageImages] = useLazyQuery(GET_COTTAGE_IMGS);
@@ -35,6 +36,8 @@ export default function EditPhotos() {
 			console.error(error);
 		}
 	}, [error]);
+
+	
 
 	const handleUploadOverlay = useCallback((show: boolean) => {
 		if (show) {
@@ -60,6 +63,8 @@ export default function EditPhotos() {
 					const { loading, error, data } = await getHideawayImages();
 					if (!loading && data) {
 						setGalleryArray(data.getHideawayImgs.galleryArray as GalImg[]);
+						console.log('setting hideaway loading false');
+						setImgsLoading(false);
 					}
 
 					if (error) {
@@ -70,7 +75,8 @@ export default function EditPhotos() {
 					const { loading, error, data } = await getCottageImages();
 					if (!loading && data) {
 						setGalleryArray(data.getCottageImgs.galleryArray as GalImg[]);
-						setIsloading(false);
+						console.log('setting cottage loading false');
+						setImgsLoading(false);
 					}
 					if (error) {
 						setError(error);
@@ -84,6 +90,17 @@ export default function EditPhotos() {
 		},
 		[propertyName]
 	);
+
+	useEffect(() => {
+		if (!imgsLoading) {
+			console.log('setting loading false');
+			setLoading(false);
+		} else {
+			console.log('setting loading true');
+			console.log('imgsLoading:', imgsLoading);
+			setLoading(true);
+		}
+	}, [galleryArray]);
 
 	useEffect(() => {
 		if (propertyName) {
@@ -100,7 +117,7 @@ export default function EditPhotos() {
 	// prop to hold images that are selected
 	return (
 		<div>
-			{isLoading ? (
+			{loading ? (
 				<Loading />
 			) : (
 				<>
