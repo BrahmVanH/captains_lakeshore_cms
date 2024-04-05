@@ -12,6 +12,7 @@ import { GalImg } from '../types';
 import styled from 'styled-components';
 import { Link } from 'react-router-dom';
 import { Property } from '../lib/__generated__/graphql';
+import Loading from './LoadingAnimation';
 
 const StyledCard = styled.div`
 	width: 80%;
@@ -57,6 +58,8 @@ const StyledBtn = styled(Button)`
 
 export default function Card({ property }: Readonly<{ property: Property }>) {
 	const [galleryArray, setGalleryArray] = useState<GalImg[] | null>([]);
+	const [imgsLoading, setImgsLoading] = useState<boolean>(false);
+	const [galleryIsLoading, setGalleryIsLoading] = useState<boolean>(false);
 	const [loading, setLoading] = useState<boolean>(false);
 	const [error, setError] = useState<any>(null);
 	const [getCottageImages] = useLazyQuery(GET_COTTAGE_IMGS);
@@ -82,6 +85,10 @@ export default function Card({ property }: Readonly<{ property: Property }>) {
 		}
 	}, []);
 
+	const handleSetGalleryIsLoading = useCallback((isLoading: boolean) => {
+		setGalleryIsLoading(isLoading);
+	}, []);
+
 	useEffect(() => {
 		console.log('property name:', property.propertyName);
 	}, [property.propertyName]);
@@ -92,7 +99,7 @@ export default function Card({ property }: Readonly<{ property: Property }>) {
 			if (propertyName === "Captain's Hideaway") {
 				const { loading, error, data } = await getHideawayImages();
 				if (loading && !data) {
-					setLoading(loading);
+					setImgsLoading(loading);
 				}
 				if (!loading && data) {
 					setGalleryArray(data.getHideawayImgs.galleryArray as GalImg[]);
@@ -125,6 +132,14 @@ export default function Card({ property }: Readonly<{ property: Property }>) {
 	}, [property]);
 
 	useEffect(() => {
+		if (!galleryIsLoading && !imgsLoading) {
+			setLoading(false);
+		} else {
+			setLoading(true);
+		}
+	}, [galleryArray]);
+
+	useEffect(() => {
 		if (error) {
 			console.error(error);
 		}
@@ -132,7 +147,7 @@ export default function Card({ property }: Readonly<{ property: Property }>) {
 	return (
 		<StyledCard id='card'>
 			{/* {galleryArray && !loading ? <ImgUploadOverlay galleryArray={galleryArray} isShown={showOverlay} /> : <></>} */}
-			{property.propertyName ? (
+			{property.propertyName && galleryArray && !loading ? (
 				<CardContainer>
 					<TitleContainer>
 						<div>
@@ -151,16 +166,13 @@ export default function Card({ property }: Readonly<{ property: Property }>) {
 							</Tooltip>
 						</BtnContainer>
 					</TitleContainer>
-					{galleryArray && !loading ? (
-						<ImgGalContainer>
-							<ImageGallery enableImageSelection={false} galleryViewportStyle={galleryViewportStyles} rowHeight={100} galleryArray={galleryArray} />
-						</ImgGalContainer>
-					) : (
-						<h2>Loading Images</h2>
-					)}
+
+					<ImgGalContainer>
+						<ImageGallery handleSetGalleryIsLoading={handleSetGalleryIsLoading} enableImageSelection={false} galleryViewportStyle={galleryViewportStyles} rowHeight={100} galleryArray={galleryArray} />
+					</ImgGalContainer>
 				</CardContainer>
 			) : (
-				<></>
+				<Loading />
 			)}
 			<EditPropertyOverlay isShown={openEditPropertyOverlay} property={property} handleOpenEditPropertyOverlay={handleOpenEditPropertyOverlay} />
 		</StyledCard>

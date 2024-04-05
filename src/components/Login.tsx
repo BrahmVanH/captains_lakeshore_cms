@@ -111,7 +111,6 @@ export default function Login() {
 
 	const handleLogin = useCallback(
 		async (loginFormData: FieldValues) => {
-			handleSetSubmitted();
 			try {
 				const { data } = await loginUser({
 					variables: {
@@ -124,6 +123,7 @@ export default function Login() {
 				if (!data?.loginUser) {
 					throw new Error('No data returned from server');
 				}
+				handleSetSubmitted();
 
 				const { token } = data.loginUser;
 

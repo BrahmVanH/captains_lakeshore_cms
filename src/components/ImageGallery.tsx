@@ -5,6 +5,7 @@ import { GalImg } from '../types';
 import { useLazyQuery } from '@apollo/client';
 import { GET_PRESEIGNED_URL } from '../lib/queries';
 import { deleteImgFromS3 } from '../lib/s3';
+import { set } from 'react-hook-form';
 // import { Button } from 'evergreen-ui';
 
 export default function ImageGallery({
@@ -14,6 +15,7 @@ export default function ImageGallery({
 	enableImageSelection,
 	selectAllImages,
 	deleteSelectedImages,
+	handleSetGalleryIsLoading,
 }: Readonly<{
 	galleryArray: GalImg[];
 	rowHeight: number;
@@ -21,10 +23,12 @@ export default function ImageGallery({
 	enableImageSelection: boolean;
 	selectAllImages?: boolean;
 	deleteSelectedImages?: boolean;
+	handleSetGalleryIsLoading: (isLoading: boolean) => void;
 }>) {
 	const [formattedGalArr, setFormattedGalArr] = useState<Image[] | null>(null);
 	const [selectedImages, setSelectedImages] = useState<Image[]>([]);
 	const btnsRef = useRef<HTMLButtonElement>(null);
+	const [isLoading, setIsLoading] = useState(true);
 
 	const hasSelected = galleryArray.some((img) => img.isSelected);
 
@@ -43,6 +47,7 @@ export default function ImageGallery({
 		});
 
 		setFormattedGalArr(formattedImages);
+		setIsLoading(false);
 	}, [galleryArray]);
 
 	const handleSelect = useCallback(
@@ -132,6 +137,10 @@ export default function ImageGallery({
 	useEffect(() => {
 		handleImageFormat();
 	}, [galleryArray, handleImageFormat]);
+
+	useEffect(() => {
+		handleSetGalleryIsLoading(isLoading);
+	}, [isLoading]);
 
 	return (
 		<div id='imageGallery' style={{ maxHeight: '100vh' }}>

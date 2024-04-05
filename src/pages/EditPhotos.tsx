@@ -6,6 +6,7 @@ import { useLazyQuery } from '@apollo/client';
 import { GET_COTTAGE_IMGS, GET_HIDEAWAY_IMGS } from '../lib/queries';
 import { GalImg } from '../types';
 import ImgUploadOverlay from '../components/ImgUploadOverlay';
+import Loading from '../components/LoadingAnimation';
 
 export default function EditPhotos() {
 	// const { propertyName } = useParams<{ propertyName: string }>();
@@ -17,6 +18,7 @@ export default function EditPhotos() {
 	const [isShown, setIsShown] = useState<boolean>(false);
 	const [selectAllImages, setSelectAllImages] = useState<boolean>(false);
 	const [deleteSelectedImages, setDeleteSelectedImages] = useState<boolean>(false);
+	const [isLoading, setIsloading] = useState<boolean>(true);
 
 	const [getHideawayImages] = useLazyQuery(GET_HIDEAWAY_IMGS);
 	const [getCottageImages] = useLazyQuery(GET_COTTAGE_IMGS);
@@ -68,6 +70,7 @@ export default function EditPhotos() {
 					const { loading, error, data } = await getCottageImages();
 					if (!loading && data) {
 						setGalleryArray(data.getCottageImgs.galleryArray as GalImg[]);
+						setIsloading(false);
 					}
 					if (error) {
 						setError(error);
@@ -97,11 +100,24 @@ export default function EditPhotos() {
 	// prop to hold images that are selected
 	return (
 		<div>
-			<SideMenu handleDeleteSelected={handleDeleteSelected} handleSetSelectAll={handleSetSelectAll} handleUploadOverlay={handleUploadOverlay} propertyName={propertyName} />
-			<div>
-				<ImageGallery deleteSelectedImages={deleteSelectedImages} selectAllImages={selectAllImages} enableImageSelection={true} galleryViewportStyle={galleryViewportStyle} rowHeight={300} galleryArray={galleryArray} />
-			</div>
-			<ImgUploadOverlay handleUploadOverlay={handleUploadOverlay} isShown={isShown} propertyName={propertyName} />
+			{isLoading ? (
+				<Loading />
+			) : (
+				<>
+					<SideMenu handleDeleteSelected={handleDeleteSelected} handleSetSelectAll={handleSetSelectAll} handleUploadOverlay={handleUploadOverlay} propertyName={propertyName} />
+					<div>
+						<ImageGallery
+							deleteSelectedImages={deleteSelectedImages}
+							selectAllImages={selectAllImages}
+							enableImageSelection={true}
+							galleryViewportStyle={galleryViewportStyle}
+							rowHeight={300}
+							galleryArray={galleryArray}
+						/>
+					</div>
+					<ImgUploadOverlay handleUploadOverlay={handleUploadOverlay} isShown={isShown} propertyName={propertyName} />
+				</>
+			)}
 		</div>
 	);
 }

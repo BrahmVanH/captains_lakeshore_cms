@@ -1,11 +1,12 @@
 import { useEffect, useState, useCallback, useRef } from 'react';
 import styled from 'styled-components';
-import { Button, Icon, Textarea, Tooltip } from 'evergreen-ui';
+import { Button, Icon, Textarea, TickCircleIcon, Tooltip } from 'evergreen-ui';
 import { GET_PROPERTY_INFO } from '../lib/queries';
 import { UPDATE_PROPERTY_INFO } from '../lib/mutations';
 import { useLazyQuery, useMutation } from '@apollo/client';
 import { Amenity, AmenityInput, Property, UpdatePropertyInput } from '../lib/__generated__/graphql';
 import { FieldValues, set, useForm } from 'react-hook-form';
+import Loading from './LoadingAnimation';
 
 const FormWrapper = styled.div(
 	({ theme }) => `
@@ -51,6 +52,14 @@ const STextarea = styled(Textarea)`
 	margin-bottom: 1rem;
 `;
 
+const BtnContainer = styled.div`
+	display: flex;
+	flex-direction: row;
+	justify-content: space-around;
+	align-items: center;
+	width: 40%;
+`;
+
 const SButton = styled(Button)`
 	color: white;
 	border: 1px solid white;
@@ -74,16 +83,19 @@ export default function EditProperty({ property }: Readonly<{ property: Property
 	const [amenities, setAmenities] = useState<Amenity[] | null>(null);
 	const [headerImgKey, setHeaderImgKey] = useState<string>('');
 	const [isEditing, setIsEditing] = useState<boolean>(false);
-	const [isLoading, setIsLoading] = useState<boolean>(false);
+	const [isLoading, setIsLoading] = useState<boolean>(true);
 	// const [updatedInfo, setUpdatedInfo] = useState<FieldValues | null>(null);
 	// const [updatedInfo, setUpdatedInfo] = useState<FieldValues | null>(null);
 	const nameInputRef = useRef<HTMLInputElement>(null);
 	const descriptionInputRef = useRef<HTMLInputElement>(null);
 	const [propertyNameInputDisabled, setPropertyNameInputDisabled] = useState<boolean>(true);
 	const [propertyDescriptionInputDisabled, setPropertyDescriptionInputDisabled] = useState<boolean>(true);
+	const [successfulUpdate, setSuccessfulUpdate] = useState<boolean>(false);
+	const [reloadPropertyInfo, setReloadPropertyInfo] = useState<boolean>(false);
 
 	// IF !ISEDITING DISABLE INPUTS
 
+	const [getPropertyInfo] = useLazyQuery(GET_PROPERTY_INFO);
 	const [updatePropertyInfo] = useMutation(UPDATE_PROPERTY_INFO);
 
 	// Handles input change form input fields - propertyName and propertyDescription inputs are pre-populated
@@ -118,70 +130,90 @@ export default function EditProperty({ property }: Readonly<{ property: Property
 	// Reverts the property name and description input fields to the "original values" that were set
 	// on render before user modifications were made.
 
-	const handleDiscardChanges = () => {
+	const handleDiscardChanges = useCallback(() => {
 		if (!originalPropertyInfo?.propertyName || !originalPropertyInfo?.propertyDescription) {
 			console.error('No original property info provided');
 			return;
 		}
+		console.log('setting original values');
 		setPropertyNameInputValue(originalPropertyInfo?.propertyName);
 		setPropertyDescriptionInputValue(originalPropertyInfo?.propertyDescription);
-
+		console.log('setting isEditing to !isEditing');
 		setIsEditing(!isEditing);
-	};
+	}, [originalPropertyInfo, isEditing]);
+
+	const handleGetPropertyInfo = useCallback(async () => {
+		if (!property?._id) {
+			console.error('No property id provided');
+			return;
+		}
+
+		const { loading, error, data } = await getPropertyInfo({ variables: { _id: property._id } });
+
+		if (error) {
+			console.error('Error fetching property info:', error);
+			return;
+		}
+
+		if (data && !loading) {
+			setOriginalPropertyInfo(data.getPropertyInfo as Property);
+			setSuccessfulUpdate(false);
+		}
+	}, [getPropertyInfo, property]);
 
 	// Handles the form submission of the property info form. The updatedInfo object contains the updated
 	// property name and description values. The updatedInfo object is then used to update the property
 	// info in the database. The current version will not allow for user-modified amenities or headerImgKey
 	// so the original values are automatically passed in.
-	const handleUpdatePropertyInfo = useCallback(
-		async (formValues: FieldValues) => {
-			if (!formValues.propertyName || !formValues.propertyDescription) {
-				console.error('No update input provided');
+	const handleUpdatePropertyInfo = useCallback(async (formValues: FieldValues, originalPropertyInfo: Property) => {
+		if (!formValues.propertyName || !formValues.propertyDescription) {
+			console.error('No update input provided');
+			return;
+		}
+
+		if (!originalPropertyInfo?._id || !originalPropertyInfo?.amenities || !originalPropertyInfo?.headerImgKey) {
+			console.error('No original property provided', originalPropertyInfo);
+			return;
+		}
+
+		const originalAmenities = getAmenitiesInput(originalPropertyInfo?.amenities);
+		const updateInput: UpdatePropertyInput = {
+			_id: originalPropertyInfo?._id,
+			update: {
+				propertyName: formValues.propertyName,
+				propertyDescription: formValues.propertyDescription,
+				amenities: originalAmenities,
+				headerImgKey: originalPropertyInfo?.headerImgKey,
+			},
+		};
+
+		console.log('Update input:', updateInput);
+
+		try {
+			const { data } = await updatePropertyInfo({ variables: { input: updateInput } });
+
+			if (!data) {
+				console.error('Error updating property info');
 				return;
 			}
 
-			if (!originalPropertyInfo?._id || !originalPropertyInfo?.amenities || !originalPropertyInfo?.headerImgKey) {
-				console.error('No original property provided');
-				return;
-			}
-
-			const originalAmenities = getAmenitiesInput(originalPropertyInfo?.amenities!);
-			const updateInput: UpdatePropertyInput = {
-				_id: originalPropertyInfo?._id,
-				update: {
-					propertyName: formValues.propertyName,
-					propertyDescription: formValues.propertyDescription,
-					amenities: originalAmenities,
-					headerImgKey: originalPropertyInfo?.headerImgKey!,
-				},
-			};
-
-			console.log('Update input:', updateInput);
-
-			try {
-				const { data } = await updatePropertyInfo({ variables: { input: updateInput } });
-
-				if (!data) {
-					console.error('Error updating property info');
-					return;
-				}
-
-				console.log('Property info updated:', data);
-			} catch (error: any) {
-				// (TODO) Function is run once on initial render to cache, will throw error... Handle error softly
-				console.error(error);
-				throw new Error(error);
-			}
-		},
-		[originalPropertyInfo, updatePropertyInfo, getAmenitiesInput]
-	);
+			console.log('Property info updated:', data);
+			setSuccessfulUpdate(true);
+			setIsEditing(false);
+			setReloadPropertyInfo(true);
+		} catch (error: any) {
+			// (TODO) Function is run once on initial render to memoize, will throw error... Handle error softly
+			console.error(error);
+			throw new Error(error);
+		}
+	}, []);
 
 	useEffect(() => {
 		if (property) {
 			setOriginalPropertyInfo(property);
-
 			setPropertyNameInputValue(property.propertyName);
 			setPropertyDescriptionInputValue(property.propertyDescription);
+			setIsLoading(false);
 		}
 	}, [property]);
 
@@ -199,39 +231,61 @@ export default function EditProperty({ property }: Readonly<{ property: Property
 		if (originalPropertyInfo) {
 			console.log('Original property info:', originalPropertyInfo);
 		} else {
-			console.error('No original property info provided');
+			console.error('No original property info provided in standalone use effect');
 		}
 	}, [originalPropertyInfo]);
+
+	useEffect(() => {
+		if (reloadPropertyInfo) {
+			handleGetPropertyInfo();
+			setReloadPropertyInfo(false);
+		}
+	}, [reloadPropertyInfo, handleGetPropertyInfo]);
+
+	useEffect(() => {
+		console.log('isEditing:', isEditing);
+	}, [isEditing]);
+
 	return (
 		<FormWrapper>
-			<h1 style={{ color: 'white' }}>Upload Image</h1>
-			<Form onSubmit={handleSubmit(handleUpdatePropertyInfo)}>
-				<Label htmlFor='propertyName'>Property Name</Label>
-				<Input {...register('propertyName', { required: true, disabled: propertyNameInputDisabled, onChange: handleInputChange })} value={propertyNameInputValue} placeholder='Property Name' />
-				{errors.propertyName && <span style={{ color: 'red' }}>This field is required</span>}
-				<Label htmlFor='propertyDescription'>Property Description</Label>
-				<STextarea
-					id='propertyDescription'
-					value={propertyDescriptionInputValue}
-					placeholder='Property Description'
-					{...register('propertyDescription', { required: true, disabled: propertyDescriptionInputDisabled, onChange: handleInputChange })}
-				/>
-				{isEditing && (
-					<SButton type='submit' appearance='minimal'>
-						Save
-					</SButton>
-				)}
+			<h1 style={{ color: 'white' }}>Update Info</h1>
+			{!isLoading && originalPropertyInfo ? (
+				<Form onSubmit={handleSubmit((data) => handleUpdatePropertyInfo(data, originalPropertyInfo))}>
+					<Label htmlFor='propertyName'>Property Name</Label>
+					<Input {...register('propertyName', { required: true, disabled: propertyNameInputDisabled, onChange: handleInputChange })} value={propertyNameInputValue} placeholder='Property Name' />
+					{errors.propertyName && <span style={{ color: 'red' }}>This field is required</span>}
+					<Label htmlFor='propertyDescription'>Property Description</Label>
+					<STextarea
+						id='propertyDescription'
+						value={propertyDescriptionInputValue}
+						placeholder='Property Description'
+						{...register('propertyDescription', { required: true, disabled: propertyDescriptionInputDisabled, onChange: handleInputChange })}
+					/>
+					{!successfulUpdate ? (
+						<BtnContainer>
+							{isEditing && (
+								<SButton type='submit' appearance='minimal'>
+									Save
+								</SButton>
+							)}
 
-				{!isEditing ? (
-					<SButton onClick={() => setIsEditing(!isEditing)} appearance='minimal'>
-						Edit
-					</SButton>
-				) : (
-					<SButton onClick={handleDiscardChanges} appearance='minimal'>
-						Discard
-					</SButton>
-				)}
-			</Form>
+							{!isEditing ? (
+								<SButton onClick={() => setIsEditing(!isEditing)} appearance='minimal'>
+									Edit
+								</SButton>
+							) : (
+								<SButton onClick={handleDiscardChanges} appearance='minimal'>
+									Discard
+								</SButton>
+							)}
+						</BtnContainer>
+					) : (
+						<Icon icon={TickCircleIcon} color='success' size={24} />
+					)}
+				</Form>
+			) : (
+				<Loading />
+			)}
 		</FormWrapper>
 	);
 }

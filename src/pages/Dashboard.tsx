@@ -7,6 +7,7 @@ import { GET_PROPERTIES, GET_PROPERTY_INFO } from '../lib/queries';
 import { Property } from '../lib/__generated__/graphql';
 import Card from '../components/Card';
 import styled from 'styled-components';
+import Loading from '../components/LoadingAnimation';
 
 const LoginCardContainer = styled.div`
 	display: flex;
@@ -37,14 +38,20 @@ export default function Dashboard() {
 		<>
 			{Auth.loggedIn() ? (
 				<>
-					{properties ? (
-						<div style={{ display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center', marginTop: '2rem' }}>
-							{properties.map((property) => (
-								<Card key={property._id} property={property} />
-							))}
-						</div>
+					{loading ? (
+						<Loading />
 					) : (
-						<h1>Loading...</h1>
+						<>
+							{properties ? (
+								<div style={{ display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center', marginTop: '2rem' }}>
+									{properties.map((property) => (
+										<Card key={property._id} property={property} />
+									))}
+								</div>
+							) : (
+								<h1>Loading...</h1>
+							)}
+						</>
 					)}
 				</>
 			) : (
