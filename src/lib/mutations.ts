@@ -77,6 +77,9 @@ export const UPDATE_PROPERTY_INFO = gql(/* GraphQL */ `
 
 export const DELETE_S3_IMG = gql(/* GraphQL */ `
 	mutation DeleteS3Object($input: DeleteS3ObjectInput!) {
-		deleteS3Object($input: $input)
+		deleteS3Object(input: $input) {
+			status
+			message
+		}
 	}
-	`);
+`);
