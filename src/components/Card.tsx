@@ -14,8 +14,7 @@ import { Link } from 'react-router-dom';
 import { Property } from '../lib/__generated__/graphql';
 import Loading from './LoadingAnimation';
 
-
-// STyled components 
+// STyled components
 
 const StyledCard = styled.div`
 	width: 80%;
@@ -68,7 +67,8 @@ export default function Card({ property }: Readonly<{ property: Property }>) {
 	const [loading, setLoading] = useState<boolean>(false);
 	const [error, setError] = useState<any>(null);
 	const [openEditPropertyOverlay, setOpenEditPropertyOverlay] = useState<boolean>(false);
-	
+	const [isMediumScreen, setIsMediumScreen] = useState<boolean>(false);
+
 	// Lazy queries to call image fetches for two properties
 	const [getCottageImages] = useLazyQuery(GET_COTTAGE_IMGS);
 	const [getHideawayImages] = useLazyQuery(GET_HIDEAWAY_IMGS);
@@ -88,9 +88,9 @@ export default function Card({ property }: Readonly<{ property: Property }>) {
 		}
 	}, []);
 
-
 	// Fetch images through Apollo API from S3
 	const handleFetchImgs = useCallback(async (propertyName: string) => {
+		if (isMediumScreen) return console.log('medium screen');
 		console.log('fetching images');
 		try {
 			if (propertyName === "Captain's Hideaway") {
@@ -120,30 +120,38 @@ export default function Card({ property }: Readonly<{ property: Property }>) {
 			console.error(error);
 			throw new Error('Error fetching images');
 		}
-	}, []);
-
+	}, [isMediumScreen]);
+	
 	useEffect(() => {
-		if (property.propertyName) {
+		if (window.innerWidth < 768) {
+			setIsMediumScreen(true);
+		}
+	}, []);
+	
+	useEffect(() => {
+		if (property.propertyName && !isMediumScreen) {
 			handleFetchImgs(property.propertyName);
 		}
 	}, [property]);
+	
 
 	useEffect(() => {
-		if (!imgsLoading) {
+		if (!imgsLoading || isMediumScreen) {
 			setLoading(false);
 		} else {
 			setLoading(true);
 		}
-	}, [galleryArray]);
+	}, [imgsLoading, isMediumScreen]);
 
 	useEffect(() => {
 		if (error) {
 			console.error(error);
 		}
 	}, [error]);
+
+
 	return (
 		<StyledCard id='card'>
-			{/* {galleryArray && !loading ? <ImgUploadOverlay galleryArray={galleryArray} isShown={showOverlay} /> : <></>} */}
 			{property.propertyName && galleryArray && !loading ? (
 				<CardContainer>
 					<TitleContainer>
@@ -164,9 +172,13 @@ export default function Card({ property }: Readonly<{ property: Property }>) {
 						</BtnContainer>
 					</TitleContainer>
 
-					<ImgGalContainer>
-						<ImageGallery enableImageSelection={false} galleryViewportStyle={galleryViewportStyles} rowHeight={100} galleryArray={galleryArray} />
-					</ImgGalContainer>
+					{isMediumScreen ? (
+						<> </>
+					) : (
+						<ImgGalContainer>
+							<ImageGallery enableImageSelection={false} galleryViewportStyle={galleryViewportStyles} rowHeight={100} galleryArray={galleryArray} />
+						</ImgGalContainer>
+					)}
 				</CardContainer>
 			) : (
 				<Loading />

@@ -13,7 +13,7 @@ export default defineConfig({
 				runtimeCaching: [
 					{
 						urlPattern: ({ url }) => {
-							return url.pathname.startsWith('/graphql');
+							return  url.pathname.startsWith('/graphql');
 						},
 						handler: 'CacheFirst' as const,
 						options: {
