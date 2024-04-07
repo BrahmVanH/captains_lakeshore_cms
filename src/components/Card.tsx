@@ -29,15 +29,16 @@ const CardContainer = styled.div`
 `;
 
 // Takes in them from global theme provider in App component
-const TitleContainer = styled.div(
-	({ theme }) => `
+const TitleContainer = styled.div<{$isMediumScreen: boolean}>(
+	({ theme, $isMediumScreen }) => `
 	display: flex;
 	flex-direction: column;
 	align-items: center;
 	justify-content: flex-start;
 	padding-right: 2rem;
 	margin: 2rem 0rem 2rem 2rem;
-	border-right: 3px solid transparent;
+	border-right: ${$isMediumScreen ? 'none' : '3px solid transparent'};
+	border=bottom: ${$isMediumScreen ? '3px solid transparent' : 'none'};
 	border-image-source: linear-gradient(${theme.primaryStroke});
 	border-image-slice: 1;
 	border-image-outset: 0;
@@ -89,51 +90,53 @@ export default function Card({ property }: Readonly<{ property: Property }>) {
 	}, []);
 
 	// Fetch images through Apollo API from S3
-	const handleFetchImgs = useCallback(async (propertyName: string) => {
-		if (isMediumScreen) return console.log('medium screen');
-		console.log('fetching images');
-		try {
-			if (propertyName === "Captain's Hideaway") {
-				const { loading, error, data } = await getHideawayImages();
-				if (loading && !data) {
-					setImgsLoading(loading);
-				}
-				if (!loading && data) {
-					setGalleryArray(data.getHideawayImgs.galleryArray as GalImg[]);
-				}
+	const handleFetchImgs = useCallback(
+		async (propertyName: string) => {
+			if (isMediumScreen) return console.log('medium screen');
+			console.log('fetching images');
+			try {
+				if (propertyName === "Captain's Hideaway") {
+					const { loading, error, data } = await getHideawayImages();
+					if (loading && !data) {
+						setImgsLoading(loading);
+					}
+					if (!loading && data) {
+						setGalleryArray(data.getHideawayImgs.galleryArray as GalImg[]);
+					}
 
-				if (error) {
-					setError(error);
-					throw new Error('Error fetching images');
+					if (error) {
+						setError(error);
+						throw new Error('Error fetching images');
+					}
+				} else if (propertyName === "Captain's Cottage") {
+					const { loading, error, data } = await getCottageImages();
+					if (!loading && data) {
+						setGalleryArray(data.getCottageImgs.galleryArray as GalImg[]);
+					}
+					if (error) {
+						setError(error);
+						throw new Error('Error fetching images');
+					}
 				}
-			} else if (propertyName === "Captain's Cottage") {
-				const { loading, error, data } = await getCottageImages();
-				if (!loading && data) {
-					setGalleryArray(data.getCottageImgs.galleryArray as GalImg[]);
-				}
-				if (error) {
-					setError(error);
-					throw new Error('Error fetching images');
-				}
+			} catch (error) {
+				console.error(error);
+				throw new Error('Error fetching images');
 			}
-		} catch (error) {
-			console.error(error);
-			throw new Error('Error fetching images');
-		}
-	}, [isMediumScreen]);
-	
+		},
+		[isMediumScreen]
+	);
+
 	useEffect(() => {
 		if (window.innerWidth < 768) {
 			setIsMediumScreen(true);
 		}
 	}, []);
-	
+
 	useEffect(() => {
 		if (property.propertyName && !isMediumScreen) {
 			handleFetchImgs(property.propertyName);
 		}
 	}, [property]);
-	
 
 	useEffect(() => {
 		if (!imgsLoading || isMediumScreen) {
@@ -149,12 +152,11 @@ export default function Card({ property }: Readonly<{ property: Property }>) {
 		}
 	}, [error]);
 
-
 	return (
 		<StyledCard id='card'>
 			{property.propertyName && galleryArray && !loading ? (
 				<CardContainer>
-					<TitleContainer>
+					<TitleContainer $isMediumScreen={isMediumScreen}>
 						<div>
 							<h1>{property.propertyName}</h1>
 						</div>
