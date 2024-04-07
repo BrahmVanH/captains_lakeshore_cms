@@ -1,6 +1,7 @@
 import { BoxProps, Overlay } from 'evergreen-ui';
 import EditProperty from './EditProperty';
 import { Property } from '../lib/__generated__/graphql';
+import { useCallback } from 'react';
 
 export default function ImgUploadOverlay({
 	isShown,
@@ -18,15 +19,20 @@ export default function ImgUploadOverlay({
 			// zIndex: '999',
 		},
 	};
+
+	const handleSetClose = useCallback(() => {
+		handleOpenEditPropertyOverlay(false);
+	}, [handleOpenEditPropertyOverlay]);
+
 	return (
 		<Overlay
 			containerProps={containerProps}
 			onExit={() => handleOpenEditPropertyOverlay(false)}
 			shouldCloseOnEscapePress={true}
-			shouldCloseOnClick={false}
+			shouldCloseOnClick={true}
 			preventBodyScrolling={true}
 			isShown={isShown}>
-			{property ? <EditProperty property={property} /> : <></>}
+			{property ? <EditProperty handleSetClose={handleSetClose} property={property} /> : <></>}
 		</Overlay>
 	);
 }

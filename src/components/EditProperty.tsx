@@ -1,12 +1,14 @@
-import { useEffect, useState, useCallback, useRef } from 'react';
+import { useEffect, useState, useCallback } from 'react';
 import styled from 'styled-components';
-import { Button, Icon, Textarea, TickCircleIcon, Tooltip } from 'evergreen-ui';
+import { Button, CrossIcon, Icon, Textarea, TickCircleIcon } from 'evergreen-ui';
 import { GET_PROPERTY_INFO } from '../lib/queries';
 import { UPDATE_PROPERTY_INFO } from '../lib/mutations';
 import { useLazyQuery, useMutation } from '@apollo/client';
-import { Amenity, AmenityInput, Property, UpdatePropertyInput } from '../lib/__generated__/graphql';
-import { FieldValues, set, useForm } from 'react-hook-form';
+import { Amenity, Property, UpdatePropertyInput } from '../lib/__generated__/graphql';
+import { FieldValues, useForm } from 'react-hook-form';
 import Loading from './LoadingAnimation';
+
+// Styled components
 
 const FormWrapper = styled.div(
 	({ theme }) => `
@@ -24,6 +26,37 @@ const FormWrapper = styled.div(
 	box-shadow: 0 0 10px 0 ${theme.primary};
 `
 );
+
+const CloseBtnContainer = styled.div`
+	width: 100%;
+	padding: 0.5rem;
+	background-color: transparent;
+	display: flex;
+	justify-content: flex-end;
+	border: none !important;
+
+	&:hover,
+	&:focus,
+	&:active,
+	&:visited,
+	&:link,
+	&.active,
+	&.hover,
+	&.focus,
+	&.visited,
+	&.link {
+		background-color: transparent !important;
+		border: none !important;
+	}
+`;
+
+// Styled Evergreen ui button
+const CloseBtn = styled(Button)`
+	background-color: transparent !important;
+	border: none !important;
+	color: white !important;
+	width: min-content;
+`;
 
 const Form = styled.form`
 	display: flex;
@@ -47,6 +80,7 @@ const Input = styled.input`
 	border: none;
 `;
 
+// Styled Evergreen ui textarea
 const STextarea = styled(Textarea)`
 	width: 100%;
 	margin-bottom: 1rem;
@@ -60,6 +94,7 @@ const BtnContainer = styled.div`
 	width: 40%;
 `;
 
+// Styled Evergreen ui button
 const SButton = styled(Button)`
 	color: white;
 	border: 1px solid white;
@@ -69,7 +104,8 @@ const SButton = styled(Button)`
 	}
 `;
 
-export default function EditProperty({ property }: Readonly<{ property: Property }>) {
+export default function EditProperty({ handleSetClose, property }: Readonly<{ handleSetClose: () => void; property: Property }>) {
+	// Destructure react-hook-form useForm() response to pass into Form component
 	const {
 		register,
 		handleSubmit,
@@ -79,22 +115,16 @@ export default function EditProperty({ property }: Readonly<{ property: Property
 	const [propertyNameInputValue, setPropertyNameInputValue] = useState<string>('');
 	const [propertyDescriptionInputValue, setPropertyDescriptionInputValue] = useState<string>('');
 	const [originalPropertyInfo, setOriginalPropertyInfo] = useState<Property | null>(null);
-	// const [formInputValues, setFormInputValues] = useState<FieldValues | null>(null);
-	const [amenities, setAmenities] = useState<Amenity[] | null>(null);
-	const [headerImgKey, setHeaderImgKey] = useState<string>('');
+
 	const [isEditing, setIsEditing] = useState<boolean>(false);
 	const [isLoading, setIsLoading] = useState<boolean>(true);
-	// const [updatedInfo, setUpdatedInfo] = useState<FieldValues | null>(null);
-	// const [updatedInfo, setUpdatedInfo] = useState<FieldValues | null>(null);
-	const nameInputRef = useRef<HTMLInputElement>(null);
-	const descriptionInputRef = useRef<HTMLInputElement>(null);
+
 	const [propertyNameInputDisabled, setPropertyNameInputDisabled] = useState<boolean>(true);
 	const [propertyDescriptionInputDisabled, setPropertyDescriptionInputDisabled] = useState<boolean>(true);
 	const [successfulUpdate, setSuccessfulUpdate] = useState<boolean>(false);
 	const [reloadPropertyInfo, setReloadPropertyInfo] = useState<boolean>(false);
 
-	// IF !ISEDITING DISABLE INPUTS
-
+	// Apollo hooks for fetching and updating property info
 	const [getPropertyInfo] = useLazyQuery(GET_PROPERTY_INFO);
 	const [updatePropertyInfo] = useMutation(UPDATE_PROPERTY_INFO);
 
@@ -130,19 +160,24 @@ export default function EditProperty({ property }: Readonly<{ property: Property
 	// Reverts the property name and description input fields to the "original values" that were set
 	// on render before user modifications were made.
 
-	const handleDiscardChanges = useCallback((event: MouseEvent) => {
-		event.preventDefault();
-		if (!originalPropertyInfo?.propertyName || !originalPropertyInfo?.propertyDescription) {
-			console.error('No original property info provided');
-			return;
-		}
-		console.log('setting original values');
-		setPropertyNameInputValue(originalPropertyInfo?.propertyName);
-		setPropertyDescriptionInputValue(originalPropertyInfo?.propertyDescription);
-		console.log('setting isEditing to !isEditing');
-		setIsEditing(!isEditing);
-	}, [originalPropertyInfo, isEditing]);
+	const handleDiscardChanges = useCallback(
+		(event: MouseEvent) => {
+			event.preventDefault();
+			if (!originalPropertyInfo?.propertyName || !originalPropertyInfo?.propertyDescription) {
+				console.error('No original property info provided');
+				return;
+			}
+			console.log('setting original values');
+			setPropertyNameInputValue(originalPropertyInfo?.propertyName);
+			setPropertyDescriptionInputValue(originalPropertyInfo?.propertyDescription);
+			console.log('setting isEditing to !isEditing');
+			setIsEditing(!isEditing);
+		},
+		[originalPropertyInfo, isEditing]
+	);
 
+
+	// Fetches the property info from the database using the property id passed in as a prop.
 	const handleGetPropertyInfo = useCallback(async () => {
 		if (!property?._id) {
 			console.error('No property id provided');
@@ -249,6 +284,9 @@ export default function EditProperty({ property }: Readonly<{ property: Property
 
 	return (
 		<FormWrapper>
+			<CloseBtnContainer>
+				<CloseBtn onClick={handleSetClose} iconBefore={CrossIcon} appearance='minimal' />
+			</CloseBtnContainer>
 			<h1 style={{ color: 'white' }}>Update Info</h1>
 			{!isLoading && originalPropertyInfo ? (
 				<Form onSubmit={handleSubmit((data) => handleUpdatePropertyInfo(data, originalPropertyInfo))}>
@@ -275,7 +313,7 @@ export default function EditProperty({ property }: Readonly<{ property: Property
 									Edit
 								</SButton>
 							) : (
-								<SButton  onClick={handleDiscardChanges} appearance='minimal'>
+								<SButton onClick={handleDiscardChanges} appearance='minimal'>
 									Discard
 								</SButton>
 							)}

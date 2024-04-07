@@ -1,5 +1,6 @@
 import { BoxProps, Overlay } from 'evergreen-ui';
 import UploadImage from './UploadImage';
+import { useCallback } from 'react';
 
 export default function ImgUploadOverlay({
 	isShown,
@@ -23,9 +24,14 @@ export default function ImgUploadOverlay({
 			// zIndex: '999',
 		},
 	};
+
+	const handleSetClose = useCallback(() => {
+		handleUploadOverlay(false);
+	}, [handleUploadOverlay]);
+
 	return (
 		<Overlay containerProps={containerProps} onExit={() => handleUploadOverlay(false)} shouldCloseOnEscapePress={true} shouldCloseOnClick={false} preventBodyScrolling={true} isShown={isShown}>
-			{propertyName ? <UploadImage handleSetImgUploadSuccess={handleSetImgUploadSuccess} propertyName={propertyName} /> : <></>}
+			{propertyName ? <UploadImage handleSetImgUploadSuccess={handleSetImgUploadSuccess} propertyName={propertyName} handleSetClose={handleSetClose} /> : <></>}
 		</Overlay>
 	);
 }

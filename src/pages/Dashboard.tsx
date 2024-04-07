@@ -3,7 +3,7 @@ import * as Auth from '../lib/auth';
 
 import Login from '../components/Login';
 import { useQuery } from '@apollo/client';
-import { GET_PROPERTIES, GET_PROPERTY_INFO } from '../lib/queries';
+import { GET_PROPERTIES } from '../lib/queries';
 import { Property } from '../lib/__generated__/graphql';
 import Card from '../components/Card';
 import styled from 'styled-components';

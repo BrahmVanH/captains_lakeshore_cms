@@ -1,10 +1,10 @@
 import { useCallback, useEffect, useState, useRef } from 'react';
 import { useLazyQuery } from '@apollo/client';
-import { useForm, FieldValues, Controller } from 'react-hook-form';
+import { useForm } from 'react-hook-form';
 import { GET_PRESEIGNED_URL } from '../lib/queries';
 import { uploadImgToS3 } from '../lib/s3';
 import styled from 'styled-components';
-import { Button, CloudUploadIcon, ImportIcon, FileUploader, TextInput, FileCard, FileRejection, Tooltip, TickCircleIcon } from 'evergreen-ui';
+import { Button, CloudUploadIcon, FileUploader, TextInput, FileCard, FileRejection, Tooltip, TickCircleIcon, CrossIcon } from 'evergreen-ui';
 
 const UploadFormWrapper = styled.div(
 	({ theme }) => `
@@ -24,16 +24,39 @@ const UploadFormWrapper = styled.div(
 `
 );
 
+const CloseBtnContainer = styled.div`
+	width: 100%;
+	padding: 0.5rem;
+	background-color: transparent;
+	display: flex;
+	justify-content: flex-end;
+	bo &:hover,
+	&:focus,
+	&:active,
+	&:visited,
+	&:link,
+	&.active,
+	&.hover,
+	&.focus,
+	&.visited,
+	&.link {
+		background-color: transparent;
+	}
+`;
+
+const CloseBtn = styled(Button)`
+	background-color: transparent;
+	border: none;
+	color: white;
+	width: min-content;
+`;
+
 const Form = styled.form`
 	display: flex;
 	flex-direction: column;
 	align-items: center;
 	width: 100%;
 `;
-
-interface InputSCProps {
-	$isFileSet: boolean;
-}
 
 const StyledTextInput = styled(TextInput)`
 	width: 30%;
@@ -55,22 +78,19 @@ const SButton = styled(Button)`
 	}
 `;
 
-const HiddenInput = styled.input`
-	display: none;
-`;
 
-export default function UploadImage({ propertyName, handleSetImgUploadSuccess }: Readonly<{ propertyName: string; handleSetImgUploadSuccess: () => void }>) {
+
+export default function UploadImage({
+	propertyName,
+	handleSetClose,
+	handleSetImgUploadSuccess,
+}: Readonly<{ propertyName: string; handleSetClose: () => void; handleSetImgUploadSuccess: () => void }>) {
 	const {
 		register,
-		handleSubmit,
-		formState: { errors },
 	} = useForm();
 
 	const [altInput, setAltInput] = useState<string | null>(null);
 	const [keyPrefix, setKeyPrefix] = useState<string>('');
-	const [fileName, setFileName] = useState<string>('');
-	const [isFileSet, setIsFileSet] = useState<boolean>(false);
-	const [image, setImage] = useState<string | number | readonly string[] | undefined>(undefined);
 	const [uploadSuccess, setUploadSuccess] = useState<boolean>(false);
 	const [altInputDisabled, setAltInputDisabled] = useState<boolean>(true);
 	const [files, setFiles] = useState<File[]>([]);
@@ -82,18 +102,9 @@ export default function UploadImage({ propertyName, handleSetImgUploadSuccess }:
 		setFileRejections([]);
 	}, []);
 
-	// const altInputRef = useRef<HTMLInputElement>(null);
-
 	const [getPresignedUrl] = useLazyQuery(GET_PRESEIGNED_URL);
 
 	const altInputRef = useRef<HTMLDivElement>(null);
-
-	// const triggerHiddenInput = useCallback(() => {
-	// 	// imgRef(hiddenInputRef.current);
-	// 	if (hiddenInputRef.current) {
-	// 		hiddenInputRef.current?.click();
-	// 	}
-	// }, [hiddenInputRef.current]);
 
 	const handleInputChange = useCallback(
 		(event: React.ChangeEvent<HTMLInputElement>) => {
@@ -104,34 +115,9 @@ export default function UploadImage({ propertyName, handleSetImgUploadSuccess }:
 	);
 
 	const handleDisableAltInput = useCallback((isDisabled: boolean) => {
-		console.log('altInputRef:', altInputRef);
 		setAltInputDisabled(isDisabled);
 	}, []);
 
-	// const handleSetFileName = useCallback(() => {
-	// 	if (hiddenInputRef?.current?.files?.[0]) {
-	// 		setFileName(hiddenInputRef.current.files?.[0].name);
-	// 		setIsFileSet(true);
-	// 	}
-	// }, [hiddenInputRef]);
-
-	// useEffect(() => {
-	// 	if (hiddenInputRef?.current?.files?.[0]) {
-	// 		setFileName(hiddenInputRef?.current?.files[0].name);
-	// 		setIsFileSet(true);
-	// 	}
-	// 	console.log('hiddenInputRef:', hiddenInputRef);
-	// }, [hiddenInputRef]);
-
-	useEffect(() => {
-		if (image) {
-			console.log('image:', image);
-		}
-	}, [image]);
-
-	// const handleEnableBtn = useCallback(() => {
-	// 	uploadBtn.current?.removeAttribute('disabled');
-	// }, [uploadBtn]);
 
 	const handleImageUpload = useCallback(
 		async (event: any) => {
@@ -207,6 +193,9 @@ export default function UploadImage({ propertyName, handleSetImgUploadSuccess }:
 
 	return (
 		<UploadFormWrapper>
+			<CloseBtnContainer>
+				<CloseBtn onClick={handleSetClose} iconBefore={CrossIcon} appearance='minimal' />
+			</CloseBtnContainer>
 			<h1 style={{ color: 'white' }}>Upload Image</h1>
 			{uploadSuccess ? (
 				<TickCircleIcon color='green' size={40} />

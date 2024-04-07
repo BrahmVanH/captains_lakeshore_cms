@@ -1,13 +1,8 @@
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { Gallery, Image } from 'react-grid-gallery';
-// import { useMutation } from '@apollo/client';
 import { GalImg } from '../types';
-import { useLazyQuery, useMutation } from '@apollo/client';
-import { GET_PRESEIGNED_URL } from '../lib/queries';
-import { set } from 'react-hook-form';
+import { useMutation } from '@apollo/client';
 import { DELETE_S3_IMG } from '../lib/mutations';
-import { DeleteS3ObjectInput } from '../lib/__generated__/graphql';
-// import { Button } from 'evergreen-ui';
 
 export default function ImageGallery({
 	galleryArray,
@@ -24,7 +19,7 @@ export default function ImageGallery({
 	enableImageSelection: boolean;
 	selectAllImages?: boolean;
 	deleteSelectedImages?: boolean;
-	handleSetImgDeleteSuccess: () => void;
+	handleSetImgDeleteSuccess?: () => void;
 }>) {
 	const [formattedGalArr, setFormattedGalArr] = useState<Image[] | null>(null);
 	const [selectedImages, setSelectedImages] = useState<Image[]>([]);
@@ -89,6 +84,8 @@ export default function ImageGallery({
 	}, [formattedGalArr]);
 
 	const handleDeleteSelected = useCallback(async () => {
+		if (!handleDeleteSelected) {
+		}
 		try {
 			if (selectedImages.length < 1 || !selectedImages[0].key || !selectedImages[0].alt) return;
 			console.log('selectedImages:', selectedImages);
@@ -102,7 +99,9 @@ export default function ImageGallery({
 			if (!data) {
 				throw new Error('Error deleting image');
 			}
-			handleSetImgDeleteSuccess();
+			if (handleSetImgDeleteSuccess) {
+				handleSetImgDeleteSuccess();
+			}
 			console.log('Image deleted successfully', data);
 			return data;
 		} catch (error: any) {

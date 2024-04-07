@@ -6,6 +6,8 @@ import Navbar from './components/Navbar';
 import Dashboard from './pages/Dashboard';
 import EditPhotos from './pages/EditPhotos';
 
+
+
 // const cache = new InMemoryCache({
 // 	typePolicies: {
 // 		Query: {
@@ -44,7 +46,6 @@ const client = new ApolloClient({
 	cache: new InMemoryCache(),
 	link: new HttpLink({
 		uri: import.meta.env.PROD ? import.meta.env.VITE_LAMBDA_FUNCTION_URI : import.meta.env.VITE_LOCALHOST,
-		// uri: import.meta.env.VITE_LAMBDA_FUNCTION_URI,
 	}),
 });
 

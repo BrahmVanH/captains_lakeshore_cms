@@ -14,6 +14,9 @@ import { Link } from 'react-router-dom';
 import { Property } from '../lib/__generated__/graphql';
 import Loading from './LoadingAnimation';
 
+
+// STyled components 
+
 const StyledCard = styled.div`
 	width: 80%;
 	margin-bottom: 2rem;
@@ -26,6 +29,7 @@ const CardContainer = styled.div`
 	justify-content: space-around;
 `;
 
+// Takes in them from global theme provider in App component
 const TitleContainer = styled.div(
 	({ theme }) => `
 	display: flex;
@@ -52,30 +56,30 @@ const BtnContainer = styled.div`
 	align-items: center;
 `;
 
+// STyled Evergreen ui button
 const StyledBtn = styled(Button)`
 	margin-bottom: 1rem;
 `;
 
+// Component takes in property object fetched by parent component
 export default function Card({ property }: Readonly<{ property: Property }>) {
 	const [galleryArray, setGalleryArray] = useState<GalImg[] | null>([]);
 	const [imgsLoading, setImgsLoading] = useState<boolean>(false);
 	const [loading, setLoading] = useState<boolean>(false);
 	const [error, setError] = useState<any>(null);
+	const [openEditPropertyOverlay, setOpenEditPropertyOverlay] = useState<boolean>(false);
+	
+	// Lazy queries to call image fetches for two properties
 	const [getCottageImages] = useLazyQuery(GET_COTTAGE_IMGS);
 	const [getHideawayImages] = useLazyQuery(GET_HIDEAWAY_IMGS);
-	const [openEditPropertyOverlay, setOpenEditPropertyOverlay] = useState<boolean>(false);
 
+	// Image gallery required custom styling depending on which parent is rendering it
 	const galleryViewportStyles: React.CSSProperties = {
 		maxHeight: 'calc(3 * (100px + 10px))',
 		overflowY: 'scroll',
 	};
 
-	// useEffect(() => {
-	// 	if (data?.getPropertyInfo) {
-	// 		setPropertyInformation(data?.getPropertyInfo as PropertyInformation);
-	// 	}
-	// }, [data]);
-
+	// Open overlay to edit property name and description
 	const handleOpenEditPropertyOverlay = useCallback((openOverlay: boolean) => {
 		if (openOverlay) {
 			setOpenEditPropertyOverlay(true);
@@ -84,10 +88,8 @@ export default function Card({ property }: Readonly<{ property: Property }>) {
 		}
 	}, []);
 
-	useEffect(() => {
-		console.log('property name:', property.propertyName);
-	}, [property.propertyName]);
 
+	// Fetch images through Apollo API from S3
 	const handleFetchImgs = useCallback(async (propertyName: string) => {
 		console.log('fetching images');
 		try {
