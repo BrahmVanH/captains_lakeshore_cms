@@ -1,7 +1,17 @@
 import { BoxProps, Overlay } from 'evergreen-ui';
 import UploadImage from './UploadImage';
 
-export default function ImgUploadOverlay({ isShown, propertyName, handleUploadOverlay }: { isShown: boolean; propertyName: string; handleUploadOverlay: (show: boolean) => void }) {
+export default function ImgUploadOverlay({
+	isShown,
+	propertyName,
+	handleUploadOverlay,
+	handleSetImgUploadSuccess,
+}: {
+	isShown: boolean;
+	propertyName: string;
+	handleUploadOverlay: (show: boolean) => void;
+	handleSetImgUploadSuccess: () => void;
+}) {
 	const containerProps: BoxProps<'div'> = {
 		style: {
 			display: 'flex',
@@ -15,7 +25,7 @@ export default function ImgUploadOverlay({ isShown, propertyName, handleUploadOv
 	};
 	return (
 		<Overlay containerProps={containerProps} onExit={() => handleUploadOverlay(false)} shouldCloseOnEscapePress={true} shouldCloseOnClick={false} preventBodyScrolling={true} isShown={isShown}>
-			{propertyName ? <UploadImage propertyName={propertyName} /> : <></>}
+			{propertyName ? <UploadImage handleSetImgUploadSuccess={handleSetImgUploadSuccess} propertyName={propertyName} /> : <></>}
 		</Overlay>
 	);
 }

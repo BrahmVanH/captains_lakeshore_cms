@@ -20,6 +20,8 @@ export default function EditPhotos() {
 	const [deleteSelectedImages, setDeleteSelectedImages] = useState<boolean>(false);
 	const [loading, setLoading] = useState<boolean>(true);
 	const [imgsLoading, setImgsLoading] = useState<boolean>(true);
+	const [imgUploadSuccess, setImgUploadSuccess] = useState<boolean>(false);
+	const [imgDeleteSuccess, setImgDeleteSuccess] = useState<boolean>(false);
 
 	const [getHideawayImages] = useLazyQuery(GET_HIDEAWAY_IMGS);
 	const [getCottageImages] = useLazyQuery(GET_COTTAGE_IMGS);
@@ -37,8 +39,6 @@ export default function EditPhotos() {
 		}
 	}, [error]);
 
-	
-
 	const handleUploadOverlay = useCallback((show: boolean) => {
 		if (show) {
 			setIsShown(true);
@@ -55,6 +55,14 @@ export default function EditPhotos() {
 		setDeleteSelectedImages(true);
 	}, []);
 
+	const handleSetImgUploadSuccess = useCallback(() => {
+		setImgUploadSuccess(true);
+	}, []);
+
+	const handleSetImgDeleteSuccess = useCallback(() => {
+		setImgDeleteSuccess(true);
+	}, []);
+
 	const handleFetchImgs = useCallback(
 		async (propertyName: string) => {
 			console.log('fetching images');
@@ -65,6 +73,8 @@ export default function EditPhotos() {
 						setGalleryArray(data.getHideawayImgs.galleryArray as GalImg[]);
 						console.log('setting hideaway loading false');
 						setImgsLoading(false);
+						setImgUploadSuccess(false);
+						setImgDeleteSuccess(false);
 					}
 
 					if (error) {
@@ -77,6 +87,8 @@ export default function EditPhotos() {
 						setGalleryArray(data.getCottageImgs.galleryArray as GalImg[]);
 						console.log('setting cottage loading false');
 						setImgsLoading(false);
+						setImgUploadSuccess(false);
+						setImgDeleteSuccess(false);
 					}
 					if (error) {
 						setError(error);
@@ -111,8 +123,15 @@ export default function EditPhotos() {
 	useEffect(() => {
 		if (propertyName) {
 			handleFetchImgs(propertyName);
+			setIsShown;
 		}
 	}, [propertyName, handleFetchImgs]);
+
+	useEffect(() => {
+		if (imgUploadSuccess || imgDeleteSuccess) {
+			window.location.reload();
+		}
+	}, [imgUploadSuccess, imgDeleteSuccess]);
 
 	// prop to hold images that are selected
 	return (
@@ -124,6 +143,7 @@ export default function EditPhotos() {
 					<SideMenu handleDeleteSelected={handleDeleteSelected} handleSetSelectAll={handleSetSelectAll} handleUploadOverlay={handleUploadOverlay} propertyName={propertyName} />
 					<div>
 						<ImageGallery
+							handleSetImgDeleteSuccess={handleSetImgDeleteSuccess}
 							deleteSelectedImages={deleteSelectedImages}
 							selectAllImages={selectAllImages}
 							enableImageSelection={true}
@@ -132,7 +152,7 @@ export default function EditPhotos() {
 							galleryArray={galleryArray}
 						/>
 					</div>
-					<ImgUploadOverlay handleUploadOverlay={handleUploadOverlay} isShown={isShown} propertyName={propertyName} />
+					<ImgUploadOverlay handleSetImgUploadSuccess={handleSetImgUploadSuccess} handleUploadOverlay={handleUploadOverlay} isShown={isShown} propertyName={propertyName} />
 				</>
 			)}
 		</div>

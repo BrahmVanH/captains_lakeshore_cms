@@ -4,7 +4,7 @@ import { useForm, FieldValues, Controller } from 'react-hook-form';
 import { GET_PRESEIGNED_URL } from '../lib/queries';
 import { uploadImgToS3 } from '../lib/s3';
 import styled from 'styled-components';
-import { Button, CloudUploadIcon, ImportIcon, FileUploader, TextInput, FileCard, FileRejection, Tooltip } from 'evergreen-ui';
+import { Button, CloudUploadIcon, ImportIcon, FileUploader, TextInput, FileCard, FileRejection, Tooltip, TickCircleIcon } from 'evergreen-ui';
 
 const UploadFormWrapper = styled.div(
 	({ theme }) => `
@@ -59,7 +59,7 @@ const HiddenInput = styled.input`
 	display: none;
 `;
 
-export default function UploadImage({ propertyName }: Readonly<{ propertyName: string }>) {
+export default function UploadImage({ propertyName, handleSetImgUploadSuccess }: Readonly<{ propertyName: string; handleSetImgUploadSuccess: () => void }>) {
 	const {
 		register,
 		handleSubmit,
@@ -71,6 +71,7 @@ export default function UploadImage({ propertyName }: Readonly<{ propertyName: s
 	const [fileName, setFileName] = useState<string>('');
 	const [isFileSet, setIsFileSet] = useState<boolean>(false);
 	const [image, setImage] = useState<string | number | readonly string[] | undefined>(undefined);
+	const [uploadSuccess, setUploadSuccess] = useState<boolean>(false);
 	const [altInputDisabled, setAltInputDisabled] = useState<boolean>(true);
 	const [files, setFiles] = useState<File[]>([]);
 	const [fileRejections, setFileRejections] = useState<FileRejection[]>([]);
@@ -157,6 +158,7 @@ export default function UploadImage({ propertyName }: Readonly<{ propertyName: s
 				if (!response.ok) {
 					throw new Error('Error in upload POST fetch: ' + response.statusText);
 				}
+				setUploadSuccess(true);
 				console.log('Image uploaded successfully', response);
 			} catch (error: any) {
 				console.error(error);
@@ -197,31 +199,41 @@ export default function UploadImage({ propertyName }: Readonly<{ propertyName: s
 		}
 	}, [files]);
 
+	useEffect(() => {
+		if (uploadSuccess) {
+			handleSetImgUploadSuccess();
+		}
+	}, [uploadSuccess]);
+
 	return (
 		<UploadFormWrapper>
 			<h1 style={{ color: 'white' }}>Upload Image</h1>
-			<Form>
-				<FileUploader
-					maxSizeInBytes={50 * 1024 ** 2}
-					maxFiles={1}
-					onChange={handleChange}
-					onRejected={handleRejected}
-					renderFile={(file) => {
-						const { name, size, type } = file;
-						const fileRejection = fileRejections.find((fileRejection) => fileRejection.file === file);
-						const { message } = fileRejection || {};
-						return <FileCard key={name} name={name} isInvalid={fileRejection != null} onRemove={handleRemove} sizeInBytes={size} type={type} validationMessage={message} />;
-					}}
-					values={files}
-				/>
+			{uploadSuccess ? (
+				<TickCircleIcon color='green' size={40} />
+			) : (
+				<Form>
+					<FileUploader
+						maxSizeInBytes={50 * 1024 ** 2}
+						maxFiles={1}
+						onChange={handleChange}
+						onRejected={handleRejected}
+						renderFile={(file) => {
+							const { name, size, type } = file;
+							const fileRejection = fileRejections.find((fileRejection) => fileRejection.file === file);
+							const { message } = fileRejection || {};
+							return <FileCard key={name} name={name} isInvalid={fileRejection != null} onRemove={handleRemove} sizeInBytes={size} type={type} validationMessage={message} />;
+						}}
+						values={files}
+					/>
 
-				<Tooltip content={<p style={{ fontSize: '12px', color: 'white', lineHeight: 'normal' }}>Please enter a brief, descriptive tag for this image</p>}>
-					<StyledTextInput {...register('altInput', { disabled: altInputDisabled, onChange: handleInputChange })} type='text' placeholder='Alt Tag' />
-				</Tooltip>
-				<SButton onClick={handleImageUpload} iconBefore={CloudUploadIcon}>
-					Upload
-				</SButton>
-			</Form>
+					<Tooltip position='right' content={<p style={{ fontSize: '12px', color: 'white', lineHeight: 'normal' }}>Please enter a brief, descriptive tag for this image</p>}>
+						<StyledTextInput {...register('altInput', { disabled: altInputDisabled, onChange: handleInputChange })} type='text' placeholder='Alt Tag' />
+					</Tooltip>
+					<SButton onClick={handleImageUpload} iconBefore={CloudUploadIcon}>
+						Upload
+					</SButton>
+				</Form>
+			)}
 		</UploadFormWrapper>
 	);
 }

@@ -6,6 +6,7 @@ import { useLazyQuery, useMutation } from '@apollo/client';
 import { GET_PRESEIGNED_URL } from '../lib/queries';
 import { set } from 'react-hook-form';
 import { DELETE_S3_IMG } from '../lib/mutations';
+import { DeleteS3ObjectInput } from '../lib/__generated__/graphql';
 // import { Button } from 'evergreen-ui';
 
 export default function ImageGallery({
@@ -15,6 +16,7 @@ export default function ImageGallery({
 	enableImageSelection,
 	selectAllImages,
 	deleteSelectedImages,
+	handleSetImgDeleteSuccess,
 }: Readonly<{
 	galleryArray: GalImg[];
 	rowHeight: number;
@@ -22,13 +24,14 @@ export default function ImageGallery({
 	enableImageSelection: boolean;
 	selectAllImages?: boolean;
 	deleteSelectedImages?: boolean;
+	handleSetImgDeleteSuccess: () => void;
 }>) {
 	const [formattedGalArr, setFormattedGalArr] = useState<Image[] | null>(null);
 	const [selectedImages, setSelectedImages] = useState<Image[]>([]);
 
 	const hasSelected = galleryArray.some((img) => img.isSelected);
 
-	const [deleteImages] = useMutation(DELETE_S3_IMG);
+	const [deleteS3Image] = useMutation(DELETE_S3_IMG);
 
 	const handleImageFormat = useCallback(() => {
 		const formattedImages: Image[] = galleryArray.map((img) => {
@@ -90,28 +93,21 @@ export default function ImageGallery({
 			if (selectedImages.length < 1 || !selectedImages[0].key || !selectedImages[0].alt) return;
 			console.log('selectedImages:', selectedImages);
 			console.log('deleting selected image from s3 bucket');
-			const { data, error } = await deleteImages({
+			const { data } = await deleteS3Image({
 				variables: {
-					imgKey: `${selectedImages[0].key}`,
-					commandType: 'delete',
-					altTag: selectedImages[0].alt,
+					input: { imgKey: `${selectedImages[0].key}` },
 				},
 			});
 
-			if (error || !data) {
-				throw new Error('Error fetching presigned URL' + error?.message);
-			}
-
-			const imageDeleted = await deleteImgFromS3(`${selectedImages[0].key}`, data.getPresignedS3Url);
-
-			if (!imageDeleted) {
+			if (!data) {
 				throw new Error('Error deleting image');
 			}
-
+			handleSetImgDeleteSuccess();
 			console.log('Image deleted successfully', data);
-		} catch (error) {
+			return data;
+		} catch (error: any) {
 			console.error(error);
-			throw new Error('Error deleting image');
+			throw new Error('Error deleting image, ' + error.message);
 		}
 	}, [selectedImages]);
 
