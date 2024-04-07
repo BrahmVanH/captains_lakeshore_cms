@@ -9,11 +9,36 @@ export default defineConfig({
 		react(),
 		VitePWA({
 			registerType: 'autoUpdate',
+			manifest: {
+				name: 'Lake Superior Captains',
+				short_name: 'LSC',
+				theme_color: '#000000',
+				background_color: '#ffffff',
+				display: 'standalone',
+				start_url: '/',
+				icons: [
+					{
+						src: '/logo.svg',
+						sizes: '48x48',
+						type: 'image/svg+xml',
+					},
+					{
+						src: '/logo.svg',
+						sizes: '96x96',
+						type: 'image/svg+xml',
+					},
+					{
+						src: '/logo.svg',
+						sizes: '192x192',
+						type: 'image/svg+xml',
+					},
+				],
+			},
 			workbox: {
 				runtimeCaching: [
 					{
 						urlPattern: ({ url }) => {
-							return  url.pathname.startsWith('/graphql');
+							return url.pathname.startsWith('/graphql');
 						},
 						handler: 'CacheFirst' as const,
 						options: {
