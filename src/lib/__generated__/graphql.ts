@@ -54,7 +54,7 @@ export type CreateUserInput = {
 };
 
 export type DeleteS3ObjectInput = {
-  imgKey: Scalars['String']['input'];
+  imgKeys: Array<Scalars['String']['input']>;
 };
 
 export type DeleteS3ObjectResponse = {
@@ -72,7 +72,7 @@ export type Mutation = {
   __typename?: 'Mutation';
   createBooking: Booking;
   createUser: Auth;
-  deleteS3Object: DeleteS3ObjectResponse;
+  deleteS3Objects: DeleteS3ObjectResponse;
   loginUser: Auth;
   removeBooking: Booking;
   removeUser: Auth;
@@ -90,7 +90,7 @@ export type MutationCreateUserArgs = {
 };
 
 
-export type MutationDeleteS3ObjectArgs = {
+export type MutationDeleteS3ObjectsArgs = {
   input: DeleteS3ObjectInput;
 };
 
@@ -254,12 +254,12 @@ export type UpdatePropertyInfoMutationVariables = Exact<{
 
 export type UpdatePropertyInfoMutation = { __typename?: 'Mutation', updatePropertyInfo: { __typename?: 'Property', _id: string, propertyName: string, propertyDescription: string, headerImgKey: string, amenities: Array<{ __typename?: 'Amenity', amenityName: string, amenityType: string }> } };
 
-export type DeleteS3ObjectMutationVariables = Exact<{
+export type DeleteS3ObjectsMutationVariables = Exact<{
   input: DeleteS3ObjectInput;
 }>;
 
 
-export type DeleteS3ObjectMutation = { __typename?: 'Mutation', deleteS3Object: { __typename?: 'DeleteS3ObjectResponse', status: number, message: string } };
+export type DeleteS3ObjectsMutation = { __typename?: 'Mutation', deleteS3Objects: { __typename?: 'DeleteS3ObjectResponse', status: number, message: string } };
 
 export type GetAllUsersQueryVariables = Exact<{ [key: string]: never; }>;
 
@@ -321,7 +321,7 @@ export const RemoveUserDocument = {"kind":"Document","definitions":[{"kind":"Ope
 export const CreateBookingDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"CreateBooking"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"input"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"CreateBookingInput"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"createBooking"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"input"},"value":{"kind":"Variable","name":{"kind":"Name","value":"input"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"dateValue"}},{"kind":"Field","name":{"kind":"Name","value":"propertyName"}}]}}]}}]} as unknown as DocumentNode<CreateBookingMutation, CreateBookingMutationVariables>;
 export const RemoveBookingDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"removeBooking"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"input"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"RemoveBookingInput"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"removeBooking"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"input"},"value":{"kind":"Variable","name":{"kind":"Name","value":"input"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"dateValue"}},{"kind":"Field","name":{"kind":"Name","value":"propertyName"}}]}}]}}]} as unknown as DocumentNode<RemoveBookingMutation, RemoveBookingMutationVariables>;
 export const UpdatePropertyInfoDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"UpdatePropertyInfo"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"input"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"UpdatePropertyInput"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"updatePropertyInfo"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"input"},"value":{"kind":"Variable","name":{"kind":"Name","value":"input"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"_id"}},{"kind":"Field","name":{"kind":"Name","value":"propertyName"}},{"kind":"Field","name":{"kind":"Name","value":"propertyDescription"}},{"kind":"Field","name":{"kind":"Name","value":"amenities"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"amenityName"}},{"kind":"Field","name":{"kind":"Name","value":"amenityType"}}]}},{"kind":"Field","name":{"kind":"Name","value":"headerImgKey"}}]}}]}}]} as unknown as DocumentNode<UpdatePropertyInfoMutation, UpdatePropertyInfoMutationVariables>;
-export const DeleteS3ObjectDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"DeleteS3Object"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"input"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"DeleteS3ObjectInput"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"deleteS3Object"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"input"},"value":{"kind":"Variable","name":{"kind":"Name","value":"input"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"status"}},{"kind":"Field","name":{"kind":"Name","value":"message"}}]}}]}}]} as unknown as DocumentNode<DeleteS3ObjectMutation, DeleteS3ObjectMutationVariables>;
+export const DeleteS3ObjectsDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"DeleteS3Objects"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"input"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"DeleteS3ObjectInput"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"deleteS3Objects"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"input"},"value":{"kind":"Variable","name":{"kind":"Name","value":"input"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"status"}},{"kind":"Field","name":{"kind":"Name","value":"message"}}]}}]}}]} as unknown as DocumentNode<DeleteS3ObjectsMutation, DeleteS3ObjectsMutationVariables>;
 export const GetAllUsersDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"GetAllUsers"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"getAllUsers"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"firstName"}},{"kind":"Field","name":{"kind":"Name","value":"lastName"}},{"kind":"Field","name":{"kind":"Name","value":"username"}}]}}]}}]} as unknown as DocumentNode<GetAllUsersQuery, GetAllUsersQueryVariables>;
 export const QueryBookingsByPropertyDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"QueryBookingsByProperty"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"propertyName"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"String"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"queryBookingsByProperty"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"propertyName"},"value":{"kind":"Variable","name":{"kind":"Name","value":"propertyName"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"_id"}},{"kind":"Field","name":{"kind":"Name","value":"dateValue"}},{"kind":"Field","name":{"kind":"Name","value":"propertyName"}}]}}]}}]} as unknown as DocumentNode<QueryBookingsByPropertyQuery, QueryBookingsByPropertyQueryVariables>;
 export const GetHomePgImgsDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"GetHomePgImgs"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"getHomePgImgs"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"headerImgUrl"}},{"kind":"Field","name":{"kind":"Name","value":"hideawayImgUrl"}},{"kind":"Field","name":{"kind":"Name","value":"cottageImgUrl"}}]}}]}}]} as unknown as DocumentNode<GetHomePgImgsQuery, GetHomePgImgsQueryVariables>;

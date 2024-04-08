@@ -2,7 +2,7 @@ import { useCallback, useEffect, useState } from 'react';
 import { Gallery, Image } from 'react-grid-gallery';
 import { GalImg } from '../types';
 import { useMutation } from '@apollo/client';
-import { DELETE_S3_IMG } from '../lib/mutations';
+import { DELETE_S3_IMGS } from '../lib/mutations';
 
 export default function ImageGallery({
 	galleryArray,
@@ -26,7 +26,7 @@ export default function ImageGallery({
 
 	const hasSelected = galleryArray.some((img) => img.isSelected);
 
-	const [deleteS3Image] = useMutation(DELETE_S3_IMG);
+	const [deleteS3Images] = useMutation(DELETE_S3_IMGS);
 
 	const handleImageFormat = useCallback(() => {
 		const formattedImages: Image[] = galleryArray.map((img) => {
@@ -58,6 +58,7 @@ export default function ImageGallery({
 
 			console.log('setting formattedGalArr:', nextImages);
 			const selectedImages = nextImages.filter((img) => img.isSelected);
+			console.log('selectedImages:', selectedImages);
 			setFormattedGalArr(nextImages);
 			setSelectedImages(selectedImages);
 		},
@@ -86,21 +87,27 @@ export default function ImageGallery({
 	const handleDeleteSelected = useCallback(async () => {
 		try {
 			if (selectedImages.length < 1 || !selectedImages[0].key || !selectedImages[0].alt) return;
-			console.log('selectedImages:', selectedImages);
+			const selectedImgKeys = selectedImages.map((img) => {
+				if (img.key) {
+					return img.key;
+				}
+				
+			});
+			console.log('selectedImgKeys:', selectedImgKeys);
 			console.log('deleting selected image from s3 bucket');
-			const { data } = await deleteS3Image({
+			const { data } = await deleteS3Images({
 				variables: {
-					input: { imgKey: `${selectedImages[0].key}` },
+					input: { imgKeys: selectedImgKeys.filter((key) => key !== undefined) as string[] },
 				},
 			});
 
 			if (!data) {
-				throw new Error('Error deleting image');
+				throw new Error('Error deleting image(s)');
 			}
 			if (handleSetImgDeleteSuccess) {
 				handleSetImgDeleteSuccess();
 			}
-			console.log('Image deleted successfully', data);
+			console.log('Image(s) deleted successfully', data);
 			return data;
 		} catch (error: any) {
 			console.error(error);
