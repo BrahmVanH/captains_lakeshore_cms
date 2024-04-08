@@ -3,7 +3,7 @@ import { useEffect, useCallback, useState } from 'react';
 import { useLazyQuery } from '@apollo/client';
 import { GET_HIDEAWAY_IMGS, GET_COTTAGE_IMGS } from '../lib/queries';
 
-import { Button, EditIcon, Tooltip } from 'evergreen-ui';
+import { Button, EditIcon, Tooltip, CalendarIcon } from 'evergreen-ui';
 
 import ImageGallery from './ImageGallery';
 import EditPropertyOverlay from './EditPropertyOverlay';
@@ -13,6 +13,7 @@ import styled from 'styled-components';
 import { Link } from 'react-router-dom';
 import { Property } from '../lib/__generated__/graphql';
 import Loading from './LoadingAnimation';
+import CalendarOverlay from './CalendarOverlay';
 
 // STyled components
 
@@ -29,7 +30,7 @@ const CardContainer = styled.div`
 `;
 
 // Takes in them from global theme provider in App component
-const TitleContainer = styled.div<{$isMediumScreen: boolean}>(
+const TitleContainer = styled.div<{ $isMediumScreen: boolean }>(
 	({ theme, $isMediumScreen }) => `
 	display: flex;
 	flex-direction: column;
@@ -68,6 +69,7 @@ export default function Card({ property }: Readonly<{ property: Property }>) {
 	const [loading, setLoading] = useState<boolean>(false);
 	const [error, setError] = useState<any>(null);
 	const [openEditPropertyOverlay, setOpenEditPropertyOverlay] = useState<boolean>(false);
+	const [openCalendarOverlay, setOpenCalendarOverlay] = useState<boolean>(false);
 	const [isMediumScreen, setIsMediumScreen] = useState<boolean>(false);
 
 	// Lazy queries to call image fetches for two properties
@@ -86,6 +88,14 @@ export default function Card({ property }: Readonly<{ property: Property }>) {
 			setOpenEditPropertyOverlay(true);
 		} else {
 			setOpenEditPropertyOverlay(false);
+		}
+	}, []);
+
+	const handleOpenCalendarOverlay = useCallback((openOverlay: boolean) => {
+		if (openOverlay) {
+			setOpenCalendarOverlay(true);
+		} else {
+			setOpenCalendarOverlay(false);
 		}
 	}, []);
 
@@ -171,6 +181,11 @@ export default function Card({ property }: Readonly<{ property: Property }>) {
 									<StyledBtn iconBefore={EditIcon}>Photos</StyledBtn>
 								</Link>
 							</Tooltip>
+							<Tooltip content={<p style={{ fontSize: '12px', color: 'white', lineHeight: 0 }}>Edit availability calendar</p>} position='right'>
+								<StyledBtn onClick={handleOpenCalendarOverlay} iconBefore={CalendarIcon}>
+									Calendar
+								</StyledBtn>
+							</Tooltip>
 						</BtnContainer>
 					</TitleContainer>
 
@@ -186,6 +201,7 @@ export default function Card({ property }: Readonly<{ property: Property }>) {
 				<Loading />
 			)}
 			<EditPropertyOverlay isShown={openEditPropertyOverlay} property={property} handleOpenEditPropertyOverlay={handleOpenEditPropertyOverlay} />
+			<CalendarOverlay isShown={openCalendarOverlay} property={property} handleOpenCalendarOverlay={handleOpenCalendarOverlay} />
 		</StyledCard>
 	);
 }

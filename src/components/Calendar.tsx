@@ -10,11 +10,11 @@ import { useLazyQuery, useMutation } from '@apollo/client';
 import { getDateValues, isSameDay } from '../lib/calendarHelpers';
 
 import 'react-calendar/dist/Calendar.css';
-import './style.css';
+// import './style.css';
 import Loading from './LoadingAnimation';
 import { Booking, CreateBookingInput } from '../lib/__generated__/graphql';
 
-function AdminCalendar({ propertyName }: Readonly<{ propertyName: string }>) {
+function AdminCalendar({ propertyName, handleSetClose }: Readonly<{ propertyName: string; handleSetClose: () => void }>) {
 	const [date, setDate] = useState(new Date());
 	const [bookings, setBookings] = useState<Booking[] | null>(null);
 	const [loading, setLoading] = useState(true);
@@ -57,8 +57,8 @@ function AdminCalendar({ propertyName }: Readonly<{ propertyName: string }>) {
 	// Function to generate custom class for the current day
 	const tileClassName = ({ date, view }: TileArgs) => {
 		if (bookings !== null && bookings.length > 0) {
-			const unavailableDateValues = getDateValues(unavailableDates);
-			if (unavailableDateValues.some((unavailableDate) => isSameDay(unavailableDate, date))) {
+			const bookingDateValues = getDateValues(bookings);
+			if (bookingDateValues.some((booking) => isSameDay(booking, date))) {
 				return 'admin-unavailable-day';
 			} else {
 				return '';
@@ -83,8 +83,8 @@ function AdminCalendar({ propertyName }: Readonly<{ propertyName: string }>) {
 		}
 	};
 
-	const handleDateChange = (value: Value, event: MouseEvent<HTMLButtonElement, MouseEvent>) => {
-    event.preventDefault();
+	const handleDateChange = (value: any, event: any) => {
+		event.preventDefault();
 		const date = new Date(value);
 		setDate(date);
 	};
@@ -103,7 +103,8 @@ function AdminCalendar({ propertyName }: Readonly<{ propertyName: string }>) {
 	// This removes an entry from the database representing a date that was unavailable to rent
 	const handleRemoveBooking = async (value: string) => {
 		try {
-			const { data } = await removeBooking({ variables: { propertyName: propertyName, dateValue: value } });
+			
+			const { data } = await removeBooking({ variables: { input: { propertyName: propertyName, dateValue: value } as CreateBookingInput } });
 			if (data) {
 				reloadPage();
 			}
@@ -128,7 +129,7 @@ function AdminCalendar({ propertyName }: Readonly<{ propertyName: string }>) {
 		}
 	};
 	// This is a handler function that is called when the user clicks on a date on the calendar
-	const onClickDay = (value: string, event: MouseEvent<HTMLButtonElement, MouseEvent>) => {
+	const onClickDay = (value: any, event: any) => {
     event.preventDefault();
 		const date = new Date(value);
 		checkIfUnavailable(date.toISOString());
@@ -141,7 +142,7 @@ function AdminCalendar({ propertyName }: Readonly<{ propertyName: string }>) {
 	}, [propertyName]);
 
 	return (
-		<>
+		<div style={{zIndex: '1000'}}>
 			{loading ? (
 				<Loading />
 			) : (
@@ -155,7 +156,7 @@ function AdminCalendar({ propertyName }: Readonly<{ propertyName: string }>) {
 					</div>
 				</div>
 			)}
-		</>
+		</div>
 	);
 }
 
