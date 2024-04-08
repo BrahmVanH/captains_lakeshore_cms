@@ -60,7 +60,7 @@ const Form = styled.form`
 
 const StyledTextInput = styled(TextInput)`
 	width: 30%;
-	margin: 1rem;
+	margin-bottom: 1rem;
 	background-color: white;
 	border: 1px solid black;
 	color: black;
@@ -78,21 +78,18 @@ const SButton = styled(Button)`
 	}
 `;
 
-
-
 export default function UploadImage({
 	propertyName,
 	handleSetClose,
 	handleSetImgUploadSuccess,
 }: Readonly<{ propertyName: string; handleSetClose: () => void; handleSetImgUploadSuccess: () => void }>) {
-	const {
-		register,
-	} = useForm();
+	const { register } = useForm();
 
 	const [altInput, setAltInput] = useState<string | null>(null);
+	const [fileNameInput, setFIleNameInput] = useState<string | null>(null);
 	const [keyPrefix, setKeyPrefix] = useState<string>('');
 	const [uploadSuccess, setUploadSuccess] = useState<boolean>(false);
-	const [altInputDisabled, setAltInputDisabled] = useState<boolean>(true);
+	const [inputsDisabled, setInputsDisabled] = useState<boolean>(true);
 	const [files, setFiles] = useState<File[]>([]);
 	const [fileRejections, setFileRejections] = useState<FileRejection[]>([]);
 	const handleChange = useCallback((files: File[]) => setFiles([files[0]]), []);
@@ -104,33 +101,36 @@ export default function UploadImage({
 
 	const [getPresignedUrl] = useLazyQuery(GET_PRESEIGNED_URL);
 
-	const altInputRef = useRef<HTMLDivElement>(null);
-
 	const handleInputChange = useCallback(
 		(event: React.ChangeEvent<HTMLInputElement>) => {
-			const { value } = event.target;
-			setAltInput(value);
+			const { name, value } = event.target;
+			if (name === 'fileNameInput') {
+				setFIleNameInput(value);
+			} else if (name === 'altInput') {
+				setAltInput(value);
+			}
 		},
 		[altInput]
 	);
 
 	const handleDisableAltInput = useCallback((isDisabled: boolean) => {
-		setAltInputDisabled(isDisabled);
+		setInputsDisabled(isDisabled);
 	}, []);
-
 
 	const handleImageUpload = useCallback(
 		async (event: any) => {
 			event.preventDefault();
-			if (!altInput || files.length === 0) {
+			if (!altInput || !fileNameInput || files.length === 0) {
 				console.error('Alt tag and image are required');
 				return;
 			}
+			const fileExt = files[0].name.split('.').pop();
+			const fileName = `${fileNameInput.split(' ').join('_')}.${fileExt}`;
 			console.log('uploading image:', files[0], altInput, keyPrefix);
 			try {
 				const { data, error } = await getPresignedUrl({
 					variables: {
-						imgKey: `${keyPrefix}/${files[0].name}`,
+						imgKey: `${keyPrefix}/${fileName}`,
 						commandType: 'put',
 						altTag: altInput,
 					},
@@ -176,10 +176,6 @@ export default function UploadImage({
 	}, [altInput]);
 
 	useEffect(() => {
-		console.log('altInputRef:', altInputRef);
-	}, [altInputRef]);
-
-	useEffect(() => {
 		if (files.length > 0) {
 			console.log('files:', files);
 		}
@@ -214,9 +210,11 @@ export default function UploadImage({
 						}}
 						values={files}
 					/>
-
-					<Tooltip position='right' content={<p style={{ fontSize: '12px', color: 'white', lineHeight: 'normal' }}>Please enter a brief, descriptive tag for this image</p>}>
-						<StyledTextInput {...register('altInput', { disabled: altInputDisabled, onChange: handleInputChange })} type='text' placeholder='Alt Tag' />
+					<Tooltip position='right' content={<p style={{ fontSize: '12px', color: 'white', lineHeight: 'normal' }}>Please enter a name for this image</p>}>
+						<StyledTextInput {...register('fileNameInput', { disabled: inputsDisabled, onChange: handleInputChange })} type='text' placeholder='Image Name' />
+					</Tooltip>{' '}
+					<Tooltip position='right' content={<p style={{ fontSize: '12px', color: 'white', lineHeight: 'normal' }}>Please enter a brief, descriptive alt tag for this image</p>}>
+						<StyledTextInput {...register('altInput', { disabled: inputsDisabled, onChange: handleInputChange })} type='text' placeholder='Alt Tag' />
 					</Tooltip>
 					<SButton onClick={handleImageUpload} iconBefore={CloudUploadIcon}>
 						Upload

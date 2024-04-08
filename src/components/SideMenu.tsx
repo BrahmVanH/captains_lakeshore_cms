@@ -32,40 +32,6 @@ const SidebarContainer = styled.div<SideBarSCProps>(({ theme, $isOpen }) => ({
 	// 	  },
 }));
 
-// const InnerWrap = styled.div<InnerWrapProps>(({ theme, $isOpen }) => ({
-// 	display: 'flex',
-// 	flexDirection: 'column',
-// 	alignItems: 'center',
-// 	justifyContent: 'center',
-// 	backgroundColor: theme.primary,
-// 	borderTop: '1px solid white',
-// 	borderBottom: '1px solid white',
-// 	borderRight: '1px solid white',
-// 	borderTopRightRadius: '6px',
-// 	borderBottomRightRadius: '6px',
-// 	width: '100%',
-// }));
-
-// Styled evergreen button
-// const ArrowButton = styled(Button)`
-// 	display: flex;
-// 	padding: 0rem;
-// 	margin: 0rem;
-// 	background-color: transparent;
-
-// 	/* &.hover,
-// 	&:hover,
-// 	&.active,
-// 	&:active &:focus,
-// 	&.focus,
-// 	&:visited,
-// 	&.visited {
-// 		background-color: transparent;
-// 		border: none;
-// 		box-shadow: none;
-// 	} */
-// `;
-
 // Styled evergreen button
 const ControlBtn = styled(Button)`
 	position: absolute;
@@ -151,6 +117,7 @@ export default function SideMenu({
 		}
 	}, [propertyName]);
 
+	// This will enable the menu buttons when the menu is open through refs to the buttons
 	const handleEnableMenuBtns = useCallback(() => {
 		if (uploadBtn.current && deleteBtn.current && selectAllBtn.current) {
 			uploadBtn.current.disabled = false;
@@ -159,6 +126,7 @@ export default function SideMenu({
 		}
 	}, []);
 
+	// This will disable the menu buttons when the menu is closed through refs to the buttons
 	const handleDisableMenuBtns = useCallback(() => {
 		if (uploadBtn.current && deleteBtn.current && selectAllBtn.current) {
 			uploadBtn.current.disabled = true;
@@ -167,12 +135,13 @@ export default function SideMenu({
 		}
 	}, []);
 
+	// Open side menu - called on mouse enter event from side menu
 	const handleOpenMenu = () => {
 		setIsOpen(true);
 		handleEnableMenuBtns();
 	};
 
-
+	// Close side menu - called on mouse exit event from side menu
 	const handleCloseMenu = () => {
 		if (!isPinned) {
 			setIsOpen(false);

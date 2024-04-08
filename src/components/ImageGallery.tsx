@@ -49,8 +49,8 @@ export default function ImageGallery({
 			if (!formattedGalArr) return;
 
 			const nextImages = formattedGalArr.map((img, i) => {
-				console.log('mapping images:', img, i, index);
 				if (i === index) {
+					console.log('img:', img, 'isSelected:', img.isSelected);
 					return { ...img, isSelected: !img.isSelected };
 				}
 				return img;
@@ -84,8 +84,6 @@ export default function ImageGallery({
 	}, [formattedGalArr]);
 
 	const handleDeleteSelected = useCallback(async () => {
-		if (!handleDeleteSelected) {
-		}
 		try {
 			if (selectedImages.length < 1 || !selectedImages[0].key || !selectedImages[0].alt) return;
 			console.log('selectedImages:', selectedImages);
