@@ -46,7 +46,7 @@ export const CREATE_BOOKING = gql(/* GraphQL */ `
 	mutation CreateBooking($input: CreateBookingInput!) {
 		createBooking(input: $input) {
 			dateValue
-			propertyName
+			propertyId
 		}
 	}
 `);
@@ -54,8 +54,7 @@ export const CREATE_BOOKING = gql(/* GraphQL */ `
 export const DELETE_BOOKING = gql(/* GraphQL */ `
 	mutation removeBooking($input: RemoveBookingInput!) {
 		removeBooking(input: $input) {
-			dateValue
-			propertyName
+			deletedCount
 		}
 	}
 `);

@@ -23,7 +23,7 @@ export default function CalendarOverlay({ isShown, property, handleOpenCalendarO
 
 	return (
 		<Overlay containerProps={containerProps} onExit={() => handleOpenCalendarOverlay(false)} shouldCloseOnEscapePress={true} shouldCloseOnClick={true} preventBodyScrolling={true} isShown={isShown}>
-			{property ? <Calendar handleSetClose={handleSetClose} propertyName={property.propertyName} /> : <></>}
+			{property ? <Calendar handleSetClose={handleSetClose} propertyId={property._id} /> : <></>}
 		</Overlay>
 	);
 }

@@ -11,11 +11,11 @@ export const GET_ALL_USERS = gql(/* GraphQL */ `
 `);
 
 export const QUERY_BOOKINGS_BY_PROPERTY = gql(/* GraphQL */ `
-	query QueryBookingsByProperty($propertyName: String!) {
-		queryBookingsByProperty(propertyName: $propertyName) {
+	query QueryBookingsByProperty($propertyId: ID!) {
+		queryBookingsByProperty(propertyId: $propertyId) {
 			_id
 			dateValue
-			propertyName
+			propertyId
 		}
 	}
 `);
