@@ -1,9 +1,7 @@
-// Sidebar.js
-
 import { useCallback, useEffect, useRef, useState } from 'react';
 import styled from 'styled-components';
 import { Button, Icon, PinIcon, UnpinIcon, DeleteIcon, UploadIcon, MultiSelectIcon, Tooltip, MenuIcon } from 'evergreen-ui';
-import { SideBarSCProps, MenuItemsSCProps } from '../types';
+import { SideBarSCProps, MenuItemsSCProps } from '../../types';
 
 // Styled component that accepts global theme object and isOpen boolean prop to conditionally transition/pin the sidebar
 const SidebarContainer = styled.div<SideBarSCProps>(({ theme, $isOpen }) => ({
@@ -73,14 +71,17 @@ const MenuItems = styled.div<MenuItemsSCProps>(
 );
 
 // Styled evergreen button
-const MenuOptionBtn = styled(Button)(({}) => ({
-	width: '80%',
-	color: 'white',
-	border: '1px solid white',
-	'&.hover, &:hover, &.active, &:active, &:focus, &.focus,	&:visited, &.visited': {
-		backgroundColor: 'transparent',
-	},
-}));
+const MenuOptionBtn = styled(Button)`
+	width: 80%;
+	color: white;
+	border: 1px solid white;
+	&:hover,
+	&:active,
+	&:focus,
+	&:visited {
+		background-color: transparent;
+	}
+`;
 
 const ToolTipTxt = styled.p`
 	font-size: 12px;
@@ -88,50 +89,35 @@ const ToolTipTxt = styled.p`
 	line-height: 0;
 `;
 
-export default function SideMenu({
-	propertyName,
-	handleUploadOverlay,
-	handleSetSelectAll,
-	handleDeleteSelected,
-}: Readonly<{
-	propertyName: string;
-	handleUploadOverlay: (show: boolean) => void;
-	handleSetSelectAll: () => void;
-	handleDeleteSelected: () => void;
-}>) {
+
+export default function SideMenu() {
 	const [isOpen, setIsOpen] = useState<boolean>(false);
 	const [isPinned, setIsPinned] = useState<boolean>(false);
 	const menuRef = useRef<HTMLDivElement>(null);
-	const uploadBtn = useRef<HTMLButtonElement>(null);
-	const deleteBtn = useRef<HTMLButtonElement>(null);
-	const selectAllBtn = useRef<HTMLButtonElement>(null);
+	const addBookingsBtn = useRef<HTMLButtonElement>(null);
+	const deleteBookingsBtn = useRef<HTMLButtonElement>(null);
 
+	// Sets the isPinned state value to the opposite of its current value
+	// Triggered by pin button in menu ui
 	const handlePinSidebar = (event: any) => {
 		event.preventDefault();
 		setIsPinned(!isPinned);
 	};
 
-	useEffect(() => {
-		if (propertyName) {
-			console.log('propertyName', propertyName);
-		}
-	}, [propertyName]);
-
 	// This will enable the menu buttons when the menu is open through refs to the buttons
+	// because the buttons are accidentally clicked when the menu is closed
 	const handleEnableMenuBtns = useCallback(() => {
-		if (uploadBtn.current && deleteBtn.current && selectAllBtn.current) {
-			uploadBtn.current.disabled = false;
-			deleteBtn.current.disabled = false;
-			selectAllBtn.current.disabled = false;
+		if (addBookingsBtn.current && deleteBookingsBtn.current) {
+			addBookingsBtn.current.disabled = false;
+			deleteBookingsBtn.current.disabled = false;
 		}
 	}, []);
 
 	// This will disable the menu buttons when the menu is closed through refs to the buttons
 	const handleDisableMenuBtns = useCallback(() => {
-		if (uploadBtn.current && deleteBtn.current && selectAllBtn.current) {
-			uploadBtn.current.disabled = true;
-			deleteBtn.current.disabled = true;
-			selectAllBtn.current.disabled = true;
+		if (addBookingsBtn.current && deleteBookingsBtn.current) {
+			addBookingsBtn.current.disabled = true;
+			deleteBookingsBtn.current.disabled = true;
 		}
 	}, []);
 
@@ -149,12 +135,7 @@ export default function SideMenu({
 		}
 	};
 
-	useEffect(() => {
-		if (menuRef.current) {
-			console.log('menuRef.current', menuRef.current);
-		}
-	}, [menuRef.current]);
-
+  
 	return (
 		<SidebarContainer ref={menuRef} $isOpen={isOpen} onMouseEnter={handleOpenMenu} onMouseLeave={handleCloseMenu}>
 			<Tooltip content={<ToolTipTxt>Pin Menu</ToolTipTxt>} position='right'>
@@ -167,13 +148,13 @@ export default function SideMenu({
 			</ControlBtn> */}
 			<MenuItems $isOpen={isOpen}>
 				<MenuOptionBtn onClick={() => handleUploadOverlay(true)} ref={uploadBtn} iconAfter={UploadIcon} appearance='minimal'>
-					Upload
+					Add Bookings
 				</MenuOptionBtn>
 				<MenuOptionBtn onClick={handleDeleteSelected} ref={deleteBtn} iconAfter={DeleteIcon} appearance='minimal'>
-					Delete
+					Delete Bookings
 				</MenuOptionBtn>
 				<MenuOptionBtn onClick={handleSetSelectAll} ref={selectAllBtn} iconAfter={MultiSelectIcon} appearance='minimal'>
-					Select All
+					
 				</MenuOptionBtn>
 			</MenuItems>
 			{/* <Tooltip

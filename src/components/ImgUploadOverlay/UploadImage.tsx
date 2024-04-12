@@ -1,8 +1,8 @@
 import { useCallback, useEffect, useState } from 'react';
 import { useLazyQuery } from '@apollo/client';
 import { useForm } from 'react-hook-form';
-import { GET_PRESEIGNED_URL } from '../lib/queries';
-import { uploadImgToS3 } from '../lib/s3';
+import { GET_PRESEIGNED_URL } from '../../lib/queries';
+import { uploadImgToS3 } from '../../lib/s3';
 import styled from 'styled-components';
 import { Button, CloudUploadIcon, FileUploader, TextInput, FileCard, FileRejection, Tooltip, TickCircleIcon, CrossIcon } from 'evergreen-ui';
 

@@ -1,12 +1,12 @@
 import { useEffect, useState, useCallback } from 'react';
 import styled from 'styled-components';
 import { Button, CrossIcon, Icon, Textarea, TickCircleIcon } from 'evergreen-ui';
-import { GET_PROPERTY_INFO } from '../lib/queries';
-import { UPDATE_PROPERTY_INFO } from '../lib/mutations';
+import { GET_PROPERTY_INFO } from '../../lib/queries';
+import { UPDATE_PROPERTY_INFO } from '../../lib/mutations';
 import { useLazyQuery, useMutation } from '@apollo/client';
-import { Amenity, Property, UpdatePropertyInput } from '../lib/__generated__/graphql';
+import { Amenity, Property, UpdatePropertyInput } from '../../lib/__generated__/graphql';
 import { FieldValues, useForm } from 'react-hook-form';
-import Loading from './LoadingAnimation';
+import Loading from '../LoadingAnimation';
 
 // Styled components
 
@@ -175,7 +175,6 @@ export default function EditProperty({ handleSetClose, property }: Readonly<{ ha
 		},
 		[originalPropertyInfo, isEditing]
 	);
-
 
 	// Fetches the property info from the database using the property id passed in as a prop.
 	const handleGetPropertyInfo = useCallback(async () => {

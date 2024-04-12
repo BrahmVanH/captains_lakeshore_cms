@@ -1,6 +1,6 @@
 import { BoxProps, Overlay } from 'evergreen-ui';
 import EditProperty from './EditProperty';
-import { Property } from '../lib/__generated__/graphql';
+import { Property } from '../../lib/__generated__/graphql';
 import { useCallback } from 'react';
 
 export default function ImgUploadOverlay({
