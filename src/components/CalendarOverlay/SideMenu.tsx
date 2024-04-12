@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import styled from 'styled-components';
-import { Button, Icon, PinIcon, UnpinIcon, DeleteIcon, UploadIcon, MultiSelectIcon, Tooltip, MenuIcon } from 'evergreen-ui';
+import { Button, Icon, PinIcon, UnpinIcon, DeleteIcon, UploadIcon, MultiSelectIcon, Tooltip, MenuIcon, AddIcon } from 'evergreen-ui';
 import { SideBarSCProps, MenuItemsSCProps } from '../../types';
 
 // Styled component that accepts global theme object and isOpen boolean prop to conditionally transition/pin the sidebar
@@ -89,13 +89,28 @@ const ToolTipTxt = styled.p`
 	line-height: 0;
 `;
 
-
-export default function SideMenu() {
+export default function SideMenu({
+	enableAddBookings,
+	enableDeleteBookings,
+	handleEnableAddBookings,
+	handleEnableDeleteBookings,
+	handleDisableBookingsEdit,
+	handleConfirmChanges,
+}: {
+	enableAddBookings: boolean;
+	enableDeleteBookings: boolean;
+	handleEnableAddBookings: () => void;
+	handleEnableDeleteBookings: () => void;
+	handleDisableBookingsEdit: () => void;
+	handleConfirmChanges: () => void;
+}) {
 	const [isOpen, setIsOpen] = useState<boolean>(false);
 	const [isPinned, setIsPinned] = useState<boolean>(false);
 	const menuRef = useRef<HTMLDivElement>(null);
-	const addBookingsBtn = useRef<HTMLButtonElement>(null);
-	const deleteBookingsBtn = useRef<HTMLButtonElement>(null);
+	const enableAddBookingsBtn = useRef<HTMLButtonElement>(null);
+	const enableDeleteBookingsBtn = useRef<HTMLButtonElement>(null);
+	const disableBookingsEditBtn = useRef<HTMLButtonElement>(null);
+	const confirmChangesBtn = useRef<HTMLButtonElement>(null);
 
 	// Sets the isPinned state value to the opposite of its current value
 	// Triggered by pin button in menu ui
@@ -107,17 +122,22 @@ export default function SideMenu() {
 	// This will enable the menu buttons when the menu is open through refs to the buttons
 	// because the buttons are accidentally clicked when the menu is closed
 	const handleEnableMenuBtns = useCallback(() => {
-		if (addBookingsBtn.current && deleteBookingsBtn.current) {
-			addBookingsBtn.current.disabled = false;
-			deleteBookingsBtn.current.disabled = false;
+		if (enableAddBookingsBtn.current && enableDeleteBookingsBtn.current && confirmChangesBtn.current && disableBookingsEditBtn.current) {
+			enableAddBookingsBtn.current.disabled = false;
+			enableDeleteBookingsBtn.current.disabled = false;
+			confirmChangesBtn.current.disabled = false;
+			disableBookingsEditBtn.current.disabled = false;
 		}
 	}, []);
 
 	// This will disable the menu buttons when the menu is closed through refs to the buttons
 	const handleDisableMenuBtns = useCallback(() => {
-		if (addBookingsBtn.current && deleteBookingsBtn.current) {
-			addBookingsBtn.current.disabled = true;
-			deleteBookingsBtn.current.disabled = true;
+		if (enableAddBookingsBtn.current && enableDeleteBookingsBtn.current && confirmChangesBtn.current && disableBookingsEditBtn.current) {
+			enableAddBookingsBtn.current.disabled = true;
+			enableDeleteBookingsBtn.current.disabled = true;
+			confirmChangesBtn.current.disabled = true;
+			disableBookingsEditBtn.current.disabled = true;
+
 		}
 	}, []);
 
@@ -135,7 +155,12 @@ export default function SideMenu() {
 		}
 	};
 
-  
+	useEffect(() => {
+		if (enableAddBookings || enableDeleteBookings) {
+			setIsPinned(true);
+		}
+	}, [enableAddBookings, enableDeleteBookings]);
+
 	return (
 		<SidebarContainer ref={menuRef} $isOpen={isOpen} onMouseEnter={handleOpenMenu} onMouseLeave={handleCloseMenu}>
 			<Tooltip content={<ToolTipTxt>Pin Menu</ToolTipTxt>} position='right'>
@@ -147,14 +172,24 @@ export default function SideMenu() {
 				{isOpen ? <Icon icon={UnpinIcon} color='white' size={12} /> : <Icon icon={PinIcon} color='white' size={12} />}
 			</ControlBtn> */}
 			<MenuItems $isOpen={isOpen}>
-				<MenuOptionBtn onClick={() => handleUploadOverlay(true)} ref={uploadBtn} iconAfter={UploadIcon} appearance='minimal'>
-					Add Bookings
-				</MenuOptionBtn>
-				<MenuOptionBtn onClick={handleDeleteSelected} ref={deleteBtn} iconAfter={DeleteIcon} appearance='minimal'>
-					Delete Bookings
-				</MenuOptionBtn>
-				<MenuOptionBtn onClick={handleSetSelectAll} ref={selectAllBtn} iconAfter={MultiSelectIcon} appearance='minimal'>
-					
+				{!enableAddBookings && !enableDeleteBookings ? (
+					<>
+						<MenuOptionBtn onClick={handleEnableAddBookings} ref={enableAddBookingsBtn} iconAfter={AddIcon} appearance='minimal'>
+							Add Bookings
+						</MenuOptionBtn>
+						<MenuOptionBtn onClick={handleEnableDeleteBookings} ref={enableDeleteBookingsBtn} iconAfter={DeleteIcon} appearance='minimal'>
+							Delete Bookings
+						</MenuOptionBtn>
+					</>
+				) : enableAddBookings || enableDeleteBookings ? (
+					<MenuOptionBtn onClick={handleConfirmChanges} ref={confirmChangesBtn} iconAfter={DeleteIcon} appearance='minimal'>
+						Save Changes
+					</MenuOptionBtn>
+				) : (
+					<></>
+				)}
+				<MenuOptionBtn onClick={handleDisableBookingsEdit} ref={disableBookingsEditBtn} iconAfter={MultiSelectIcon} appearance='minimal'>
+					Disable Editing
 				</MenuOptionBtn>
 			</MenuItems>
 			{/* <Tooltip

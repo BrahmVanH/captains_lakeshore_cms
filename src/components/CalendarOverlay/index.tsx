@@ -1,15 +1,14 @@
-import { useState } from 'react';
+import { useState, useCallback } from 'react';
 import { BoxProps, Overlay } from 'evergreen-ui';
 import { Property } from '../../lib/__generated__/graphql';
-import { useCallback } from 'react';
 import Calendar from './Calendar';
+import SideMenu from './SideMenu';
 
 export default function CalendarOverlay({ isShown, property, handleOpenCalendarOverlay }: Readonly<{ isShown: boolean; property: Property; handleOpenCalendarOverlay: (show: boolean) => void }>) {
 	const [enableAddBookings, setEnableAddBookings] = useState<boolean>(false);
 	const [enableDeleteBookings, setEnableDeleteBookings] = useState<boolean>(false);
-	const [bookSelected, setBookSelected] = useState<boolean>(false);
-	const [deleteSelected, setDeleteSelected] = useState<boolean>(false);
-	
+	const [confirmChanges, setConfirmChanges] = useState<boolean>(false);
+
 	const containerProps: BoxProps<'div'> = {
 		style: {
 			display: 'flex',
@@ -28,15 +27,40 @@ export default function CalendarOverlay({ isShown, property, handleOpenCalendarO
 
 	const handleEnableAddBookings = useCallback(() => {
 		setEnableAddBookings(true);
+		setEnableDeleteBookings(false);
 	}, []);
 
 	const handleEnableDeleteBookings = useCallback(() => {
 		setEnableDeleteBookings(true);
+		setEnableAddBookings(false);
+	}, []);
+
+	const handleDisableBookingsEdit = useCallback(() => {
+		setEnableAddBookings(false);
+		setEnableDeleteBookings(false);
+	}, []);
+
+	const handleConfirmChanges = useCallback(() => {
+		setConfirmChanges(true);
 	}, []);
 
 	return (
 		<Overlay containerProps={containerProps} onExit={() => handleOpenCalendarOverlay(false)} shouldCloseOnEscapePress={true} shouldCloseOnClick={true} preventBodyScrolling={true} isShown={isShown}>
-			{property ? <Calendar deleteSelected={deleteSelected} bookSelected={bookSelected} enableAddBookings={enableAddBookings} enableDeleteBookings={enableDeleteBookings} handleSetClose={handleSetClose} propertyId={property._id} /> : <></>}
+			{property ? (
+				<>
+					<SideMenu
+						enableAddBookings={enableAddBookings}
+						enableDeleteBookings={enableDeleteBookings}
+						handleEnableAddBookings={handleEnableAddBookings}
+						handleEnableDeleteBookings={handleEnableDeleteBookings}
+						handleDisableBookingsEdit={handleDisableBookingsEdit}
+						handleConfirmChanges={handleConfirmChanges}
+					/>
+					<Calendar confirmChanges={confirmChanges} enableAddBookings={enableAddBookings} enableDeleteBookings={enableDeleteBookings} handleSetClose={handleSetClose} propertyId={property._id} />
+				</>
+			) : (
+				<></>
+			)}
 		</Overlay>
 	);
 }

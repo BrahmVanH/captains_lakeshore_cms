@@ -12,9 +12,10 @@ import styled from 'styled-components';
 import { Link } from 'react-router-dom';
 import { Property } from '../lib/__generated__/graphql';
 import Loading from './LoadingAnimation';
-
-const CalendarOverlay = lazy(() => import('./CalendarOverlay'));
-const EditPropertyOverlay = lazy(() => import('./EditPropertyOverlay'));
+import EditPropertyOverlay from './EditPropertyOverlay';
+import CalendarOverlay from './CalendarOverlay';
+// const CalendarOverlay = lazy(() => import('./CalendarOverlay/index'));
+// const EditPropertyOverlay = lazy(() => import('./EditPropertyOverlay/index'));
 
 // STyled components
 
