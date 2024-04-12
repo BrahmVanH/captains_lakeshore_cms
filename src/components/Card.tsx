@@ -1,7 +1,7 @@
 import { useEffect, useCallback, useState, lazy, Suspense } from 'react';
 
-import { useLazyQuery } from '@apollo/client';
-import { GET_HIDEAWAY_IMGS, GET_COTTAGE_IMGS } from '../lib/queries';
+// import { useLazyQuery } from '@apollo/client';
+// import { GET_HIDEAWAY_IMGS, GET_COTTAGE_IMGS } from '../lib/queries';
 
 import { Button, EditIcon, Tooltip, CalendarIcon } from 'evergreen-ui';
 
@@ -64,18 +64,14 @@ const StyledBtn = styled(Button)`
 `;
 
 // Component takes in property object fetched by parent component
-export default function Card({ property }: Readonly<{ property: Property }>) {
-	const [galleryArray, setGalleryArray] = useState<GalImg[] | null>([]);
-	const [imgsLoading, setImgsLoading] = useState<boolean>(false);
-	const [loading, setLoading] = useState<boolean>(false);
+export default function Card({ galleryArray, property }: Readonly<{ galleryArray: GalImg[], property: Property }>) {
+	// const [imgsLoading, setImgsLoading] = useState<boolean>(true);
 	const [error, setError] = useState<any>(null);
 	const [openEditPropertyOverlay, setOpenEditPropertyOverlay] = useState<boolean>(false);
 	const [openCalendarOverlay, setOpenCalendarOverlay] = useState<boolean>(false);
 	const [isMediumScreen, setIsMediumScreen] = useState<boolean>(false);
 
-	// Lazy queries to call image fetches for two properties
-	const [getCottageImages] = useLazyQuery(GET_COTTAGE_IMGS);
-	const [getHideawayImages] = useLazyQuery(GET_HIDEAWAY_IMGS);
+	
 
 	// Image gallery required custom styling depending on which parent is rendering it
 	const galleryViewportStyles: React.CSSProperties = {
@@ -100,73 +96,39 @@ export default function Card({ property }: Readonly<{ property: Property }>) {
 		}
 	}, []);
 
-	// Fetch images through Apollo API from S3
-	const handleFetchImgs = useCallback(
-		async (propertyName: string) => {
-			if (isMediumScreen) return console.log('medium screen');
-			console.log('fetching images');
-			try {
-				if (propertyName === "Captain's Hideaway") {
-					const { loading, error, data } = await getHideawayImages();
-					if (loading && !data) {
-						setImgsLoading(loading);
-					}
-					if (!loading && data) {
-						setGalleryArray(data.getHideawayImgs.galleryArray as GalImg[]);
-					}
 
-					if (error) {
-						setError(error);
-						throw new Error('Error fetching images');
-					}
-				} else if (propertyName === "Captain's Cottage") {
-					const { loading, error, data } = await getCottageImages();
-					if (!loading && data) {
-						setGalleryArray(data.getCottageImgs.galleryArray as GalImg[]);
-					}
-					if (error) {
-						setError(error);
-						throw new Error('Error fetching images');
-					}
-				}
-			} catch (error) {
-				console.error(error);
-				throw new Error('Error fetching images');
-			}
-		},
-		[isMediumScreen]
-	);
 
-	useEffect(() => {
-		if (window.innerWidth < 768) {
-			setIsMediumScreen(true);
-		}
-	}, []);
 
-	useEffect(() => {
-		if (property.propertyName && !isMediumScreen) {
-			handleFetchImgs(property.propertyName);
-		}
-	}, [property]);
 
-	useEffect(() => {
-		if (!imgsLoading || isMediumScreen) {
-			setLoading(false);
-		} else {
-			setLoading(true);
-		}
-	}, [imgsLoading, isMediumScreen]);
+	// useEffect(() => {
+	// 	if (property.propertyName && !isMediumScreen) {
+	// 		handleFetchImgs(property.propertyName);
+	// 	}
+	// }, [property]);
+
+	// useEffect(() => {
+	// 	if (!imgsLoading || isMediumScreen) {
+	// 		setLoading(false);
+	// 	} else {
+	// 		setLoading(true);
+	// 	}
+	// }, [imgsLoading, isMediumScreen]);
 
 	useEffect(() => {
 		if (error) {
 			console.error(error);
 		}
 	}, [error]);
+	
+		useEffect(() => {
+			if (window.innerWidth < 768) {
+				setIsMediumScreen(true);
+			}
+		}, []);
 
 	return (
-		<Suspense fallback={<Loading />}>
 			<StyledCard id='card'>
-				{property.propertyName && galleryArray && !loading ? (
+				{galleryArray ? (
 					<CardContainer>
 						<TitleContainer $isMediumScreen={isMediumScreen}>
 							<div>
@@ -205,6 +167,5 @@ export default function Card({ property }: Readonly<{ property: Property }>) {
 				<EditPropertyOverlay isShown={openEditPropertyOverlay} property={property} handleOpenEditPropertyOverlay={handleOpenEditPropertyOverlay} />
 				<CalendarOverlay isShown={openCalendarOverlay} property={property} handleOpenCalendarOverlay={handleOpenCalendarOverlay} />
 			</StyledCard>
-		</Suspense>
 	);
 }
