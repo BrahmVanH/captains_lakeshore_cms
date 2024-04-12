@@ -31,7 +31,8 @@ body {
 }
 
 .booked-calendar-day {
-	background-color: #5f8fa5 !important;
+	/* background-color: #5f8fa5 !important; */
+	background-color: red !important;
 	color: black !important;
 	cursor: allowed;
 }

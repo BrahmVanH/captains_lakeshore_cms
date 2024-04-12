@@ -30,7 +30,7 @@ const DropdownBtn = styled.button`
 `;
 
 const DropdownMenu = styled.div<{ $openDropdownMenu: boolean }>(
-	({ $openDropdownMenu, theme }) => `
+	({ $openDropdownMenu }) => `
 	display: ${$openDropdownMenu ? 'flex' : 'none'};
 	flex-direction: column;
 	align-items: center;

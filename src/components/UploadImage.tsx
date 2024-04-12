@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState, useRef } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { useLazyQuery } from '@apollo/client';
 import { useForm } from 'react-hook-form';
 import { GET_PRESEIGNED_URL } from '../lib/queries';

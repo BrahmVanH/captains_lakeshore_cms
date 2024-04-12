@@ -1,6 +1,6 @@
-import React, { useState, useEffect, useCallback, MouseEvent } from 'react';
-import View, { Calendar, TileArgs } from 'react-calendar';
-import Value from 'react-calendar';
+import { useState, useEffect, useCallback } from 'react';
+import { Calendar, TileArgs } from 'react-calendar';
+// import Value from 'react-calendar';
 
 import { QUERY_BOOKINGS_BY_PROPERTY } from '../lib/queries';
 import { CREATE_BOOKING, DELETE_BOOKING } from '../lib/mutations';
@@ -10,9 +10,8 @@ import { useLazyQuery, useMutation } from '@apollo/client';
 import { getDateValues, isSameDay, convertToDateArr } from '../lib/calendarHelpers';
 
 import 'react-calendar/dist/Calendar.css';
-// import './style.css';
 import Loading from './LoadingAnimation';
-import { Booking, CreateBookingInput, QueryQueryBookingsByPropertyArgs, RemoveBookingInput, Scalars } from '../lib/__generated__/graphql';
+import { Booking } from '../lib/__generated__/graphql';
 import { Button } from 'evergreen-ui';
 
 function AdminCalendar({ propertyId, handleSetClose }: Readonly<{ propertyId: string; handleSetClose: () => void }>) {
@@ -56,17 +55,24 @@ function AdminCalendar({ propertyId, handleSetClose }: Readonly<{ propertyId: st
 		window.location.reload();
 	};
 
+	useEffect(() => {
+		if (loading) {
+			console.log(handleSetClose);
+		}
+	}, [loading]);
+
 	// Function to generate custom class for the current day
-	const tileClassName = ({ date, view }: TileArgs) => {
-		if (!selectedDates || selectedDates.length === 0 || !bookings || bookings.length === 0) {
+	const tileClassName = ({ date }: TileArgs) => {
+		if (!bookings || bookings.length === 0) {
 			return;
 		}
 		const selDates = convertToDateArr(selectedDates);
 		const bookedDates = getDateValues(bookings);
 
-		if (bookedDates.some((booking) => isSameDay(booking, date))) {
+		if (bookedDates && bookedDates.some((booking) => isSameDay(booking, date))) {
+			console.log('adding class booked-calendar-day');
 			return 'booked-calendar-day';
-		} else if (selDates.some((selDate) => isSameDay(selDate, date))) {
+		} else if (selDates && selDates.some((selDate) => isSameDay(selDate, date))) {
 			return 'selected-calendar-day';
 		} else {
 			return '';
@@ -77,14 +83,15 @@ function AdminCalendar({ propertyId, handleSetClose }: Readonly<{ propertyId: st
 	// created from calling getDateValues
 	const tileContent = ({ date, view }: TileArgs) => {
 		if (bookings !== null && bookings.length > 0) {
-			console.log('bookings:', bookings);
 			const bookingsDateValues = getDateValues(bookings);
 			const isUnavailable = bookingsDateValues.some((bookingDate) =>
 				view === 'month'
 					? bookingDate.getFullYear() === date.getFullYear() && bookingDate.getMonth() === date.getMonth() && bookingDate.toDateString() === date.toDateString()
 					: bookingDate.toDateString() === date.toDateString()
 			);
-
+			if (isUnavailable) {
+				console.log('isUnavailable:', isUnavailable);
+			}
 			return isUnavailable;
 		} else {
 			return null;
@@ -99,6 +106,8 @@ function AdminCalendar({ propertyId, handleSetClose }: Readonly<{ propertyId: st
 	// This adds an entry to the datebase representing a date that is unavailable to rent
 	const handleAddBookings = useCallback(async () => {
 		if (toBeBooked.length === 0) {
+			console.log('No dates to add');
+
 			return;
 		}
 		const newBookings = toBeBooked.map((date) => ({ dateValue: date, propertyId }));
@@ -141,7 +150,7 @@ function AdminCalendar({ propertyId, handleSetClose }: Readonly<{ propertyId: st
 		const proposedDateOverlap = bookings.filter((date) => date.dateValue === value);
 		const isSelected = selectedDates.includes(value);
 
-		if (isSelected) {
+		if (!isSelected) {
 			let dates = selectedDates;
 			selectedDates.forEach((date, index) => {
 				if (date === value) {

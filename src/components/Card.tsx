@@ -1,4 +1,4 @@
-import { useEffect, useCallback, useState } from 'react';
+import { useEffect, useCallback, useState, lazy, Suspense } from 'react';
 
 import { useLazyQuery } from '@apollo/client';
 import { GET_HIDEAWAY_IMGS, GET_COTTAGE_IMGS } from '../lib/queries';
@@ -6,14 +6,15 @@ import { GET_HIDEAWAY_IMGS, GET_COTTAGE_IMGS } from '../lib/queries';
 import { Button, EditIcon, Tooltip, CalendarIcon } from 'evergreen-ui';
 
 import ImageGallery from './ImageGallery';
-import EditPropertyOverlay from './EditPropertyOverlay';
 
 import { GalImg } from '../types';
 import styled from 'styled-components';
 import { Link } from 'react-router-dom';
 import { Property } from '../lib/__generated__/graphql';
 import Loading from './LoadingAnimation';
-import CalendarOverlay from './CalendarOverlay';
+
+const CalendarOverlay = lazy(() => import('./CalendarOverlay'));
+const EditPropertyOverlay = lazy(() => import('./EditPropertyOverlay'));
 
 // STyled components
 
@@ -163,45 +164,47 @@ export default function Card({ property }: Readonly<{ property: Property }>) {
 	}, [error]);
 
 	return (
-		<StyledCard id='card'>
-			{property.propertyName && galleryArray && !loading ? (
-				<CardContainer>
-					<TitleContainer $isMediumScreen={isMediumScreen}>
-						<div>
-							<h1>{property.propertyName}</h1>
-						</div>
-						<BtnContainer>
-							<Tooltip content={<p style={{ fontSize: '12px', color: 'white', lineHeight: 0 }}>Edit property name and description</p>} position='right'>
-								<StyledBtn onClick={handleOpenEditPropertyOverlay} iconBefore={EditIcon}>
-									Property Info
-								</StyledBtn>
-							</Tooltip>
-							<Tooltip content={<p style={{ fontSize: '12px', color: 'white', lineHeight: 0 }}>Upload and delete property photos</p>} position='right'>
-								<Link to={`/photos/${property.propertyName}`} state={{ propertyName: property.propertyName }}>
-									<StyledBtn iconBefore={EditIcon}>Photos</StyledBtn>
-								</Link>
-							</Tooltip>
-							<Tooltip content={<p style={{ fontSize: '12px', color: 'white', lineHeight: 0 }}>Edit availability calendar</p>} position='right'>
-								<StyledBtn onClick={handleOpenCalendarOverlay} iconBefore={CalendarIcon}>
-									Calendar
-								</StyledBtn>
-							</Tooltip>
-						</BtnContainer>
-					</TitleContainer>
+		<Suspense fallback={<Loading />}>
+			<StyledCard id='card'>
+				{property.propertyName && galleryArray && !loading ? (
+					<CardContainer>
+						<TitleContainer $isMediumScreen={isMediumScreen}>
+							<div>
+								<h1>{property.propertyName}</h1>
+							</div>
+							<BtnContainer>
+								<Tooltip content={<p style={{ fontSize: '12px', color: 'white', lineHeight: 0 }}>Edit property name and description</p>} position='right'>
+									<StyledBtn onClick={handleOpenEditPropertyOverlay} iconBefore={EditIcon}>
+										Property Info
+									</StyledBtn>
+								</Tooltip>
+								<Tooltip content={<p style={{ fontSize: '12px', color: 'white', lineHeight: 0 }}>Upload and delete property photos</p>} position='right'>
+									<Link to={`/photos/${property.propertyName}`} state={{ propertyName: property.propertyName }}>
+										<StyledBtn iconBefore={EditIcon}>Photos</StyledBtn>
+									</Link>
+								</Tooltip>
+								<Tooltip content={<p style={{ fontSize: '12px', color: 'white', lineHeight: 0 }}>Edit availability calendar</p>} position='right'>
+									<StyledBtn onClick={handleOpenCalendarOverlay} iconBefore={CalendarIcon}>
+										Calendar
+									</StyledBtn>
+								</Tooltip>
+							</BtnContainer>
+						</TitleContainer>
 
-					{isMediumScreen ? (
-						<> </>
-					) : (
-						<ImgGalContainer>
-							<ImageGallery enableImageSelection={false} galleryViewportStyle={galleryViewportStyles} rowHeight={100} galleryArray={galleryArray} />
-						</ImgGalContainer>
-					)}
-				</CardContainer>
-			) : (
-				<Loading />
-			)}
-			<EditPropertyOverlay isShown={openEditPropertyOverlay} property={property} handleOpenEditPropertyOverlay={handleOpenEditPropertyOverlay} />
-			<CalendarOverlay isShown={openCalendarOverlay} property={property} handleOpenCalendarOverlay={handleOpenCalendarOverlay} />
-		</StyledCard>
+						{isMediumScreen ? (
+							<> </>
+						) : (
+							<ImgGalContainer>
+								<ImageGallery enableImageSelection={false} galleryViewportStyle={galleryViewportStyles} rowHeight={100} galleryArray={galleryArray} />
+							</ImgGalContainer>
+						)}
+					</CardContainer>
+				) : (
+					<Loading />
+				)}
+				<EditPropertyOverlay isShown={openEditPropertyOverlay} property={property} handleOpenEditPropertyOverlay={handleOpenEditPropertyOverlay} />
+				<CalendarOverlay isShown={openCalendarOverlay} property={property} handleOpenCalendarOverlay={handleOpenCalendarOverlay} />
+			</StyledCard>
+		</Suspense>
 	);
 }

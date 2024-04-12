@@ -1,12 +1,13 @@
+import { lazy, Suspense } from 'react';
 import { ApolloClient, HttpLink, InMemoryCache, ApolloProvider } from '@apollo/client';
 import { HashRouter as Router, Routes, Route } from 'react-router-dom';
 
 import { ThemeProvider } from 'styled-components';
 import Navbar from './components/Navbar';
-import Dashboard from './pages/Dashboard';
-import EditPhotos from './pages/EditPhotos';
+import Loading from './components/LoadingAnimation';
 
-
+const Dashboard = lazy(() => import('./pages/Dashboard'));
+const EditPhotos = lazy(() => import('./pages/EditPhotos'));
 
 // const cache = new InMemoryCache({
 // 	typePolicies: {
@@ -62,8 +63,8 @@ function App() {
 				<ThemeProvider theme={theme}>
 					<Navbar />
 					<Routes>
-						<Route path='/' element={<Dashboard />} />
-						<Route path='/photos/:property' element={<EditPhotos />} />
+						<Route path='/' element={<DashboardPage />} />
+						<Route path='/photos/:property' element={<EditPhotosPage />} />
 					</Routes>
 				</ThemeProvider>
 			</ApolloProvider>
@@ -72,3 +73,15 @@ function App() {
 }
 
 export default App;
+
+const DashboardPage = () => (
+	<Suspense fallback={<Loading />}>
+		<Dashboard />
+	</Suspense>
+);
+
+const EditPhotosPage = () => (
+	<Suspense fallback={<Loading />}>
+		<EditPhotos />
+	</Suspense>
+);
