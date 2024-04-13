@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback } from 'react';
-import { Calendar, TileArgs, TileClassNameFunc } from 'react-calendar';
+import { Calendar, TileArgs, TileClassNameFunc, TileDisabledFunc } from 'react-calendar';
 // import Value from 'react-calendar';
 
 import { QUERY_BOOKINGS_BY_PROPERTY } from '../../lib/queries';
@@ -26,6 +26,7 @@ function AdminCalendar({
 	const [loading, setLoading] = useState(true);
 	const [selectedDates, setSelectedDates] = useState<string[]>([]);
 	const [tileClassName, setTileClassName] = useState<TileClassNameFunc | null>(null);
+	const [tileDisabled, setTileDisabled] = useState<TileDisabledFunc | undefined>(undefined);
 
 	// Checks database for booked dates for the passed in property
 	const [getBookings] = useLazyQuery(QUERY_BOOKINGS_BY_PROPERTY);
@@ -59,40 +60,61 @@ function AdminCalendar({
 		}
 	}, []);
 
-	const reloadPage = () => {
-		window.location.reload();
-	};
+	const tileClassNameEditDisabled = useCallback(
+		({ date }: TileArgs) => {
+			if (!bookings || bookings.length === 0) {
+				return;
+			}
+			const bookedDates = getDateValues(bookings);
 
-	const tileClassNameEditDisabled = ({ date }: TileArgs) => {
-		if (!bookings || bookings.length === 0) {
-			return;
-		}
-		const bookedDates = getDateValues(bookings);
+			if (bookedDates && bookedDates.some((booking) => isSameDay(booking, date))) {
+				return 'disabled-booked-calendar-day';
+			} else if (!bookedDates.some((booking) => isSameDay(booking, date))) {
+				return 'disabled-calendar-day';
+			}
+		},
+		[bookings]
+	);
 
-		if (bookedDates && bookedDates.some((booking) => isSameDay(booking, date))) {
-			return 'disabled-booked-calendar-day';
-		} else if (!bookedDates.some((booking) => isSameDay(booking, date))) {
-			return 'disabled-calendar-day';
-		}
-	};
+	const tileDisabledEditDisabled = useCallback(() => {
+		return true;
+	}, [bookings]);
 
 	// Function to generate custom class for the current day
-	const tileClassNameEnabledDeleteBookings = ({ date }: TileArgs) => {
-		if (!bookings || bookings.length === 0) {
-			return;
-		}
-		const selDates = convertToDateArr(selectedDates);
-		const bookedDates = getDateValues(bookings);
-		if (bookedDates && bookedDates.some((booking) => isSameDay(booking, date)) && selDates && selDates.some((selDate) => isSameDay(selDate, date))) {
-			return 'selected-booked-calendar-day';
-		} else if (bookedDates && bookedDates.some((booking) => isSameDay(booking, date))) {
-			return 'booked-calendar-day';
-		} else if (!bookedDates.some((booking) => isSameDay(booking, date))) {
-			return 'disabled-calendar-day';
-		} else if (selDates && selDates.some((selDate) => isSameDay(selDate, date))) {
-			return 'selected-calendar-day';
-		}
-	};
+	const tileClassNameEnabledDeleteBookings = useCallback(
+		({ date }: TileArgs) => {
+			if (!bookings || bookings.length === 0) {
+				return;
+			}
+			const selDates = convertToDateArr(selectedDates);
+			const bookedDates = getDateValues(bookings);
+			if (bookedDates && bookedDates.some((booking) => isSameDay(booking, date)) && selDates && selDates.some((selDate) => isSameDay(selDate, date))) {
+				return 'selected-booked-calendar-day';
+			} else if (bookedDates && bookedDates.some((booking) => isSameDay(booking, date))) {
+				return 'booked-calendar-day';
+			} else if (!bookedDates.some((booking) => isSameDay(booking, date))) {
+				return 'disabled-calendar-day';
+			} else if (selDates && selDates.some((selDate) => isSameDay(selDate, date))) {
+				return 'selected-calendar-day';
+			}
+		},
+		[bookings]
+	);
+
+	const tileDisabledEnabledDeleteBookings = useCallback(
+		({ date }: TileArgs) => {
+			if (!bookings || bookings.length === 0) {
+				return true;
+			}
+			const bookedDates = getDateValues(bookings);
+			if (bookedDates && bookedDates.some((booking) => isSameDay(booking, date))) {
+				return false;
+			} else {
+				return true;
+			}
+		},
+		[bookings]
+	);
 
 	// Function to generate custom class for the current day
 	const tileClassNameEnabledAddBookings = ({ date }: TileArgs) => {
@@ -103,29 +125,59 @@ function AdminCalendar({
 		const bookedDates = getDateValues(bookings);
 
 		if (bookedDates && bookedDates.some((booking) => isSameDay(booking, date))) {
-			return 'disabled-booked-calendar-day';
+			return 'booked-calendar-day';
 		} else if (selDates && selDates.some((selDate) => isSameDay(selDate, date))) {
 			return 'selected-calendar-day';
 		} else {
 			return '';
 		}
 	};
+
+	const tileDisabledEnabledAddBookings = useCallback(
+		({ date }: TileArgs) => {
+			if (!bookings || bookings.length === 0) {
+				return true;
+			}
+			const bookedDates = getDateValues(bookings);
+			if (bookedDates && bookedDates.some((booking) => isSameDay(booking, date))) {
+				return true;
+			} else {
+				return false;
+			}
+		},
+		[bookings]
+	);
 	// This creates an elements to be appended to each date on the calendar that matches a date in a new unavailableDates array
 	// created from calling getDateValues
-	const tileContent = useCallback(({ date, view }: TileArgs) => {
-		if (bookings !== null && bookings.length > 0) {
-			const bookingsDateValues = getDateValues(bookings);
-			const isUnavailable = bookingsDateValues.some((bookingDate) =>
-				view === 'month'
-					? bookingDate.getFullYear() === date.getFullYear() && bookingDate.getMonth() === date.getMonth() && bookingDate.toDateString() === date.toDateString()
-					: bookingDate.toDateString() === date.toDateString()
-			);
+	const tileContent = useCallback(
+		({ date, view }: TileArgs) => {
+			if (bookings !== null && bookings.length > 0) {
+				const bookingsDateValues = getDateValues(bookings);
+				const isUnavailable = bookingsDateValues.some((bookingDate) =>
+					view === 'month'
+						? bookingDate.getFullYear() === date.getFullYear() && bookingDate.getMonth() === date.getMonth() && bookingDate.toDateString() === date.toDateString()
+						: bookingDate.toDateString() === date.toDateString()
+				);
 
-			return isUnavailable;
+				return isUnavailable;
+			} else {
+				return null;
+			}
+		},
+		[bookings]
+	);
+
+	// This is a handler function that is called when the user clicks on a date on the calendar
+	const onClickDay = (value: any, event: any) => {
+		console.log('Clicked Day:', value.toDateString());
+		console.log('event:', event);
+		event.preventDefault();
+		if (selectedDates.includes(value.toDateString())) {
+			setSelectedDates(selectedDates.filter((date) => date !== value.toDateString()));
 		} else {
-			return null;
+			setSelectedDates([...selectedDates, value.toDateString()]);
 		}
-	}, [bookings]);
+	};
 
 	const handleDateChange = (value: any, event: any) => {
 		event.preventDefault();
@@ -144,6 +196,7 @@ function AdminCalendar({
 			const { data } = await createBooking({ variables: { input: { bookings: newBookings } } });
 			if (data && propertyId) {
 				handleGetBookings(propertyId);
+				setSelectedDates([]);
 			}
 		} catch (err) {
 			console.error(err);
@@ -153,7 +206,7 @@ function AdminCalendar({
 	// This removes an entry from the database representing a date that was unavailable to rent
 	const handleDeleteBookings = useCallback(async () => {
 		const selectedBookingIds = selectedDates.map((date) => bookings?.find((booking) => booking.dateValue === date)?._id).filter((id) => id !== undefined) as string[];
-		console.log('Selected Booking Ids:', selectedBookingIds)
+		console.log('Selected Booking Ids:', selectedBookingIds);
 		if (selectedBookingIds.length === 0) {
 			console.log('No dates to delete');
 			return;
@@ -163,6 +216,7 @@ function AdminCalendar({
 			const { data } = await removeBooking({ variables: { input: { bookingIds: selectedBookingIds } } });
 			if (data && propertyId) {
 				handleGetBookings(propertyId);
+				setSelectedDates([]);
 			}
 		} catch (err) {
 			console.error(err);
@@ -171,16 +225,6 @@ function AdminCalendar({
 
 	// This takes in the selected date value from the calendar and compares to the unavailableDates state
 	// and returns a value if there is a match. the value is created as an unavailableDate object in db
-
-	// This is a handler function that is called when the user clicks on a date on the calendar
-	const onClickDay = (value: any, event: any) => {
-		event.preventDefault();
-		if (selectedDates.includes(value.toDateString())) {
-			setSelectedDates(selectedDates.filter((date) => date !== value.toDateString()));
-		} else {
-			setSelectedDates([...selectedDates, value.toDateString()]);
-		}
-	};
 
 	const handleConfirmChanges = () => {
 		if (enableAddBookings) {
@@ -207,10 +251,13 @@ function AdminCalendar({
 	useEffect(() => {
 		if (enableAddBookings) {
 			setTileClassName(() => tileClassNameEnabledAddBookings);
+			setTileDisabled(() => tileDisabledEnabledAddBookings);
 		} else if (enableDeleteBookings) {
 			setTileClassName(() => tileClassNameEnabledDeleteBookings);
+			setTileDisabled(() => tileDisabledEnabledDeleteBookings);
 		} else {
 			setTileClassName(() => tileClassNameEditDisabled);
+			setTileDisabled(() => tileDisabledEditDisabled);
 		}
 	}, [enableAddBookings, enableDeleteBookings, bookings, selectedDates]);
 
@@ -224,7 +271,6 @@ function AdminCalendar({
 		console.log('confirmChanges:', confirmChanges);
 	}, [confirmChanges]);
 
-
 	return (
 		<div style={{ zIndex: '1000' }}>
 			{loading ? (
@@ -232,7 +278,7 @@ function AdminCalendar({
 			) : (
 				<div>
 					<div className='admin-calendar-container'>
-						<Calendar tileContent={tileContent} onChange={handleDateChange} value={date} onClickDay={onClickDay} tileClassName={tileClassName} />
+						<Calendar tileContent={tileContent} onChange={handleDateChange} value={date} onClickDay={onClickDay} tileClassName={tileClassName} tileDisabled={tileDisabled} />
 					</div>
 
 					<div className='calendar-key'>

@@ -12,10 +12,10 @@ import styled from 'styled-components';
 import { Link } from 'react-router-dom';
 import { Property } from '../lib/__generated__/graphql';
 import Loading from './LoadingAnimation';
-import EditPropertyOverlay from './EditPropertyOverlay';
-import CalendarOverlay from './CalendarOverlay';
-// const CalendarOverlay = lazy(() => import('./CalendarOverlay/index'));
-// const EditPropertyOverlay = lazy(() => import('./EditPropertyOverlay/index'));
+// import EditPropertyOverlay from './EditPropertyOverlay';
+// import CalendarOverlay from './CalendarOverlay';
+const CalendarOverlay = lazy(() => import('./CalendarOverlay/index'));
+const EditPropertyOverlay = lazy(() => import('./EditPropertyOverlay/index'));
 
 // STyled components
 
@@ -128,6 +128,7 @@ export default function Card({ galleryArray, property }: Readonly<{ galleryArray
 		}, []);
 
 	return (
+		<Suspense fallback={<Loading />}>
 			<StyledCard id='card'>
 				{galleryArray ? (
 					<CardContainer>
@@ -168,5 +169,6 @@ export default function Card({ galleryArray, property }: Readonly<{ galleryArray
 				<EditPropertyOverlay isShown={openEditPropertyOverlay} property={property} handleOpenEditPropertyOverlay={handleOpenEditPropertyOverlay} />
 				<CalendarOverlay isShown={openCalendarOverlay} property={property} handleOpenCalendarOverlay={handleOpenCalendarOverlay} />
 			</StyledCard>
+		</Suspense>
 	);
 }

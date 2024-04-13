@@ -101,10 +101,11 @@ export default function Dashboard() {
 			{Auth.loggedIn() ? (
 				<>
 					{loading ? (
-						<Loading />
+						// <Loading />
+						<></>
 					) : (
 						<>
-							{properties && galleryArray && !loading ? (
+							{properties && galleryArray ? (
 								<div style={{ display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center', marginTop: '2rem' }}>
 									{properties.map((property) => (
 										<Card key={property._id} galleryArray={galleryArray} property={property} />
