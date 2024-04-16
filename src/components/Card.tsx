@@ -65,14 +65,12 @@ const StyledBtn = styled(Button)`
 `;
 
 // Component takes in property object fetched by parent component
-export default function Card({ galleryArray, property }: Readonly<{ galleryArray: GalImg[], property: Property }>) {
+export default function Card({ galleryArray, property }: Readonly<{ galleryArray: GalImg[]; property: Property }>) {
 	// const [imgsLoading, setImgsLoading] = useState<boolean>(true);
 	const [error, setError] = useState<any>(null);
 	const [openEditPropertyOverlay, setOpenEditPropertyOverlay] = useState<boolean>(false);
 	const [openCalendarOverlay, setOpenCalendarOverlay] = useState<boolean>(false);
 	const [isMediumScreen, setIsMediumScreen] = useState<boolean>(false);
-
-	
 
 	// Image gallery required custom styling depending on which parent is rendering it
 	const galleryViewportStyles: React.CSSProperties = {
@@ -97,10 +95,6 @@ export default function Card({ galleryArray, property }: Readonly<{ galleryArray
 		}
 	}, []);
 
-
-
-
-
 	// useEffect(() => {
 	// 	if (property.propertyName && !isMediumScreen) {
 	// 		handleFetchImgs(property.propertyName);
@@ -120,12 +114,12 @@ export default function Card({ galleryArray, property }: Readonly<{ galleryArray
 			console.error(error);
 		}
 	}, [error]);
-	
-		useEffect(() => {
-			if (window.innerWidth < 768) {
-				setIsMediumScreen(true);
-			}
-		}, []);
+
+	useEffect(() => {
+		if (window.innerWidth < 768) {
+			setIsMediumScreen(true);
+		}
+	}, []);
 
 	return (
 		<Suspense fallback={<Loading />}>

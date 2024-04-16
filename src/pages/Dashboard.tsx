@@ -29,10 +29,7 @@ export default function Dashboard() {
 	const [getCottageImages] = useLazyQuery(GET_COTTAGE_IMGS);
 	const [getHideawayImages] = useLazyQuery(GET_HIDEAWAY_IMGS);
 
-
 	const { loading, error, data } = useQuery(GET_PROPERTIES);
-
-	
 
 	// Fetch images through Apollo API from S3
 	const handleFetchImgs = useCallback(
@@ -70,11 +67,11 @@ export default function Dashboard() {
 		[isMediumScreen]
 	);
 
-		useEffect(() => {
-			if (window.innerWidth < 768) {
-				setIsMediumScreen(true);
-			}
-		}, []);
+	useEffect(() => {
+		if (window.innerWidth < 768) {
+			setIsMediumScreen(true);
+		}
+	}, []);
 
 	useEffect(() => {
 		if (data?.getProperties && !loading && !error) {

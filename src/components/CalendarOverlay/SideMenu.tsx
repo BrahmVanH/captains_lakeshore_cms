@@ -137,7 +137,6 @@ export default function SideMenu({
 			enableDeleteBookingsBtn.current.disabled = true;
 			confirmChangesBtn.current.disabled = true;
 			disableBookingsEditBtn.current.disabled = true;
-
 		}
 	}, []);
 
