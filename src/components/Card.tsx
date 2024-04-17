@@ -1,8 +1,5 @@
 import { useEffect, useCallback, useState, lazy, Suspense } from 'react';
 
-// import { useLazyQuery } from '@apollo/client';
-// import { GET_HIDEAWAY_IMGS, GET_COTTAGE_IMGS } from '../lib/queries';
-
 import { Button, EditIcon, Tooltip, CalendarIcon } from 'evergreen-ui';
 
 import ImageGallery from './ImageGallery';
@@ -12,8 +9,9 @@ import styled from 'styled-components';
 import { Link } from 'react-router-dom';
 import { Property } from '../lib/__generated__/graphql';
 import Loading from './LoadingAnimation';
-// import EditPropertyOverlay from './EditPropertyOverlay';
-// import CalendarOverlay from './CalendarOverlay';
+
+
+// Lazy import overlay components
 const CalendarOverlay = lazy(() => import('./CalendarOverlay/index'));
 const EditPropertyOverlay = lazy(() => import('./EditPropertyOverlay/index'));
 
@@ -67,7 +65,7 @@ const StyledBtn = styled(Button)`
 // Component takes in property object fetched by parent component
 export default function Card({ galleryArray, property }: Readonly<{ galleryArray: GalImg[]; property: Property }>) {
 	// const [imgsLoading, setImgsLoading] = useState<boolean>(true);
-	const [error, setError] = useState<any>(null);
+	// const [error, setError] = useState<any>(null);
 	const [openEditPropertyOverlay, setOpenEditPropertyOverlay] = useState<boolean>(false);
 	const [openCalendarOverlay, setOpenCalendarOverlay] = useState<boolean>(false);
 	const [isMediumScreen, setIsMediumScreen] = useState<boolean>(false);
@@ -109,11 +107,6 @@ export default function Card({ galleryArray, property }: Readonly<{ galleryArray
 	// 	}
 	// }, [imgsLoading, isMediumScreen]);
 
-	useEffect(() => {
-		if (error) {
-			console.error(error);
-		}
-	}, [error]);
 
 	useEffect(() => {
 		if (window.innerWidth < 768) {

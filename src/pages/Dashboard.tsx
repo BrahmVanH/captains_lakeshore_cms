@@ -23,7 +23,6 @@ export default function Dashboard() {
 	const [isMediumScreen, setIsMediumScreen] = useState<boolean>(false);
 
 	const [galleryArray, setGalleryArray] = useState<GalImg[] | null>(null);
-	const [imgsLoading, setImgsLoading] = useState<boolean>(true);
 
 	// Lazy queries to call image fetches for two properties
 	const [getCottageImages] = useLazyQuery(GET_COTTAGE_IMGS);
@@ -52,7 +51,6 @@ export default function Dashboard() {
 					const { loading, error, data } = await getCottageImages();
 					if (!loading && data) {
 						setGalleryArray(data.getCottageImgs.galleryArray as GalImg[]);
-						setImgsLoading(false);
 					}
 					if (error) {
 						console.error(error);

@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import styled from 'styled-components';
-import { Button, Icon, PinIcon, UnpinIcon, DeleteIcon, UploadIcon, MultiSelectIcon, Tooltip, MenuIcon, AddIcon } from 'evergreen-ui';
+import { Button, Icon, PinIcon, UnpinIcon, DeleteIcon, MultiSelectIcon, Tooltip, MenuIcon, AddIcon } from 'evergreen-ui';
 import { SideBarSCProps, MenuItemsSCProps } from '../../types';
 
 // Styled component that accepts global theme object and isOpen boolean prop to conditionally transition/pin the sidebar

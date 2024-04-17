@@ -1,10 +1,10 @@
 import { useState, useEffect, useCallback } from 'react';
+import styled from 'styled-components';
 import { Calendar, TileArgs, TileClassNameFunc, TileDisabledFunc } from 'react-calendar';
-// import Value from 'react-calendar';
+import { Button, CrossIcon } from 'evergreen-ui';
 
 import { QUERY_BOOKINGS_BY_PROPERTY } from '../../lib/queries';
 import { CREATE_BOOKING, DELETE_BOOKING } from '../../lib/mutations';
-
 import { useLazyQuery, useMutation } from '@apollo/client';
 
 import { getDateValues, isSameDay, convertToDateArr } from '../../lib/calendarHelpers';
@@ -12,7 +12,33 @@ import { getDateValues, isSameDay, convertToDateArr } from '../../lib/calendarHe
 import 'react-calendar/dist/Calendar.css';
 import Loading from '../LoadingAnimation';
 import { Booking } from '../../lib/__generated__/graphql';
-import { Button } from 'evergreen-ui';
+
+const CloseBtnContainer = styled.div`
+	width: 100%;
+	padding: 0.5rem;
+	background-color: transparent;
+	display: flex;
+	justify-content: flex-end;
+	bo &:hover,
+	&:focus,
+	&:active,
+	&:visited,
+	&:link,
+	&.active,
+	&.hover,
+	&.focus,
+	&.visited,
+	&.link {
+		background-color: transparent;
+	}
+`;
+
+const CloseBtn = styled(Button)`
+	background-color: transparent;
+	border: none;
+	color: white;
+	width: min-content;
+`;
 
 function AdminCalendar({
 	propertyId,
@@ -287,6 +313,9 @@ function AdminCalendar({
 				<Loading />
 			) : (
 				<div>
+					<CloseBtnContainer>
+						<CloseBtn onClick={handleSetClose} iconBefore={CrossIcon} appearance='minimal' />
+					</CloseBtnContainer>
 					<div className='admin-calendar-container'>
 						<Calendar onChange={handleDateChange} value={date} onClickDay={onClickDay} tileClassName={tileClassName} tileDisabled={tileDisabled} />
 					</div>
